@@ -1,5 +1,5 @@
 <div class="container mx-auto px-4 py-8">
-  <h1 class="text-4xl font-bold text-blue-600 mb-8 text-center">Code Generator by Zuber⭐</h1>
+  <h1 class="text-4xl font-bold text-blue-600 mb-8 text-center">Code Writer by Zuber⭐</h1>
   
   <form (ngSubmit)="generateCode()" class="bg-white shadow-xl rounded-lg p-8 mb-8 mx-4 sm:mx-8 lg:mx-16 xl:mx-24">
     <label class="block text-gray-700 text-lg font-semibold mb-4">Enter Prompt:</label>
@@ -33,6 +33,6 @@
         </div>
     <pre id="codeBlock" class="p-6 rounded-lg overflow-x-auto bg-black text-green-400">{{ generatedContent }}</pre>
   </div>
+  <iframe [src]="iframeSrc" *ngIf="iframeSrc && !isLoading" class="w-[1060px] h-[500px] shadow-xl rounded-lg p-8 mx-4 sm:mx-8 lg:mx-16 xl:mx-24"></iframe>
   
-  <iframe [src]="iframeSrc" *ngIf="iframeSrc && !isLoading" class="w-full h-[500px] border-0 mt-8 rounded-lg shadow-xl mx-4 sm:mx-8 lg:mx-16 xl:mx-24"></iframe>
 </div>
