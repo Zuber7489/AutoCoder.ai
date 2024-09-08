@@ -30,7 +30,9 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+               "node_modules/prismjs/themes/prism.css",
+               "node_modules/highlight.js/styles/default.css"
             ],
             "scripts": []
           },
