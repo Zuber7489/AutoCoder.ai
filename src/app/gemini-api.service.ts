@@ -18,7 +18,7 @@ export class GeminiApiService {
       // For text-only input, use the gemini-pro model
       const model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-      const result = await model.generateContent(prompt+"USING HTML AND internal CSS ONLY");
+      const result = await model.generateContent(prompt+"USING HTML AND internal CSS ONLY Beautiful,Awesome CSS");
       const response = await result.response;
       const text = response.text();
 
