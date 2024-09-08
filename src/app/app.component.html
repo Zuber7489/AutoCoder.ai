@@ -1,38 +1,34 @@
 <div class="container mx-auto px-4 py-8">
-  <h1 class="text-4xl font-bold text-blue-600 mb-8 text-center">Code Writer by Zuber⭐</h1>
-  
-  <form (ngSubmit)="generateCode()" class="bg-white shadow-xl rounded-lg p-8 mb-8 mx-4 sm:mx-8 lg:mx-16 xl:mx-24">
+  <h1 class="text-3xl sm:text-4xl font-bold text-blue-600 mb-8 text-center">Code Writer by Zuber⭐</h1>
+
+  <form (ngSubmit)="generateCode()" class="bg-white shadow-xl rounded-lg p-4 sm:p-8 mb-8 mx-2 sm:mx-4 lg:mx-16">
     <label class="block text-gray-700 text-lg font-semibold mb-4">Enter Prompt:</label>
     <input type="text" [(ngModel)]="prompt" name="prompt" required
-      class="border border-gray-300 p-4 rounded-lg w-full mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+      class="border border-gray-300 p-3 sm:p-4 rounded-lg w-full mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
       placeholder="Enter your prompt here..."/>
 
-      <button type="submit" class="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 relative" [disabled]="isLoading">
-        <span *ngIf="!isLoading">Generate Code</span>
-        <span *ngIf="isLoading" class="text-danger">loading...</span>
-      </button>
+    <button type="submit" class="bg-blue-600 text-white py-2 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 relative" [disabled]="isLoading">
+      <span *ngIf="!isLoading">Generate Code</span>
+      <span *ngIf="isLoading" class="text-danger">loading...</span>
+    </button>
   </form>
 
-  <div *ngIf="isLoading" class="flex justify-center items-center h-[500px] mt-[-100px]" >
-    <div class="spinner-border animate-spin inline-block w-16 h-16 border-4 rounded-full border-blue-600 border-t-transparent"></div>
+  <div *ngIf="isLoading" class="flex justify-center items-center h-[300px] sm:h-[500px] mt-[-50px] sm:mt-[-100px]">
+    <div class="spinner-border animate-spin inline-block w-12 sm:w-16 h-12 sm:h-16 border-4 rounded-full border-blue-600 border-t-transparent"></div>
   </div>
 
-  <div *ngIf="!isLoading && generatedContent" class="bg-black shadow-xl rounded-lg p-8 mx-4 sm:mx-8 lg:mx-16 xl:mx-24">
-        <!-- Sticky Copy Bar -->
-        <div class="sticky top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center p-4 shadow-lg z-50">
-          <span class="text-lg font-semibold">Generated Code</span>
-          <button (click)="copyToClipboard()" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
-            <span *ngIf="!copied" class="text-danger">
-              Copy
-            </span>
-            <span *ngIf="copied" class="text-danger">
-              Copied!
-            </span>
-          </button>
-          
-        </div>
-    <pre id="codeBlock" class="p-6 rounded-lg overflow-x-auto bg-black text-green-400">{{ generatedContent }}</pre>
+  <div *ngIf="!isLoading && generatedContent" class="bg-black shadow-xl rounded-lg p-4 sm:p-8 mx-2 sm:mx-4 lg:mx-16">
+    <!-- Sticky Copy Bar -->
+    <div class="sticky top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center p-4 shadow-lg z-50">
+      <span class="text-lg font-semibold">Generated Code</span>
+      <button (click)="copyToClipboard()" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+        <span *ngIf="!copied" class="text-danger">Copy</span>
+        <span *ngIf="copied" class="text-danger">Copied!</span>
+      </button>
+    </div>
+
+    <pre id="codeBlock" class="p-4 sm:p-6 rounded-lg overflow-x-auto bg-black text-green-400">{{ generatedContent }}</pre>
   </div>
-  <iframe [src]="iframeSrc" *ngIf="iframeSrc && !isLoading" class="w-[1060px] h-[500px] shadow-xl rounded-lg p-8 mx-4 sm:mx-8 lg:mx-16 xl:mx-24"></iframe>
-  
+
+  <iframe [src]="iframeSrc" *ngIf="iframeSrc && !isLoading" class="w-full sm:w-[1060px] h-[300px] sm:h-[500px] shadow-xl rounded-lg p-4 sm:p-8 mx-2 sm:mx-4 lg:mx-16"></iframe>
 </div>
