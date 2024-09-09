@@ -51,7 +51,7 @@
   }
 
   .text-gradient {
-    background: linear-gradient(90deg, #00d4ff, #007bff, #ff8b00);
+    background: linear-gradient(90deg, #00d4ff, #007bff, #91ff00);
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
@@ -71,7 +71,7 @@
     background: #007bff;
     border-radius: 2px;
     opacity: 0; /* Initial opacity for the animation */
-    animation: underlineFadeIn 1s forwards ease-in-out 2s;
+    
   }
   
   /* Text Gradient Animation */
@@ -92,17 +92,7 @@
     animation: gradientAnimation 3s ease infinite;
   }
   
-  /* Underline fade-in animation */
-  @keyframes underlineFadeIn {
-    0% {
-      opacity: 0;
-      width: 0;
-    }
-    100% {
-      opacity: 1;
-      width: 310px;
-    }
-  }
+
   
     
   
