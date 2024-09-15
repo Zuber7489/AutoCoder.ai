@@ -14,7 +14,8 @@ export class AppComponent {
   private texts: string[] = [
     'Ask Me Anything...',
     'Generate Code',
-    'Generate HTML & CSS Code'
+    'Generate Website',
+    'Generate HTML CSS'
   ];
   private index: number = 0;
   private interval: any;
