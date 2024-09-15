@@ -11,6 +11,13 @@ import { Clipboard } from '@angular/cdk/clipboard';  // Import Clipboard from An
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  private texts: string[] = [
+    'Ask Me Anything...',
+    'Generate Code',
+    'Generate HTML & CSS Code'
+  ];
+  private index: number = 0;
+  private interval: any;
   title = 'code_gen';
   generatedContent: string = '';
   prompt: string = '';
@@ -19,7 +26,33 @@ export class AppComponent {
   copied: boolean = false;
   askmeanything:boolean=true;
   constructor(private geminiApi: GeminiApiService,private sanitizer: DomSanitizer,private clipboard: Clipboard) {}
+  ngOnInit(): void {
+    this.startTextTransition();
+  }
 
+  startTextTransition(): void {
+    const transitionText = document.getElementById('transitionText');
+    if (!transitionText) return;
+
+    this.typeText(transitionText, this.texts[this.index]);
+  }
+
+  typeText(element: HTMLElement, text: string) {
+    let i = 0;
+    element.textContent = '';
+    
+    const typingInterval = setInterval(() => {
+      element.textContent += text.charAt(i);
+      i++;
+      if (i > text.length) {
+        clearInterval(typingInterval);
+        setTimeout(() => {
+          this.index = (this.index + 1) % this.texts.length;
+          this.typeText(element, this.texts[this.index]);
+        }, 2000); // Pause before next text starts typing
+      }
+    }, 100); // Adjust typing speed
+  }
   async generateCode() {
     this.askmeanything=false;
     this.isLoading = true;
