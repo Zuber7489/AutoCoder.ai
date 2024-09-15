@@ -1,99 +1,62 @@
-.spinner-border {
-    border-width: 0.25em;
-    border-radius: 50%;
-    border-style: solid;
-    border-color: transparent;
-    border-top-color: currentColor;
-  }
-  .animated-gradient-border-btn {
-    padding: 12px 24px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: white;
-    // background-color: black;
-    border: 3px solid transparent;
-    border-radius: 12px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    z-index: 1;
-    transition: all 0.3s ease;
-  }
-  
-  .animated-gradient-border-btn:before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    z-index: -1;
-    background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc, #ffcc00);
-    background-size: 300%;
-    border-radius: 15px;
-    animation: animated-gradient 5s linear infinite;
-  }
-  
-  .animated-gradient-border-btn:hover:before {
-    background-size: 400%;
-  }
-  
-  @keyframes animated-gradient {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
+.fixed-form {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 0.5rem;
+  background: transparent; /* Remove background */
+}
 
-  .text-gradient {
-    background: linear-gradient(90deg, #00d4ff, #007bff, #91ff00);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    letter-spacing: 0.05em;
-    position: relative;
-  }
-  
-  .text-gradient::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -10px;
-    width: 80px;
-    height: 4px;
-    background: #007bff;
-    border-radius: 2px;
-    opacity: 0; /* Initial opacity for the animation */
-    
-  }
-  
-  /* Text Gradient Animation */
-  @keyframes gradientAnimation {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-  
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradientAnimation 3s ease infinite;
-  }
-  
+.input-container {
+  position: relative; /* To position the button inside the container */
+  display: flex;
+  align-items: center;
+}
 
-  
-    
-  
-  
+.search-input {
+  border: 1px solid #ccc;
+  padding: 10px 16px; /* Adjust padding for a smaller size */
+  border-radius: 4px; /* Rounded corners on all sides */
+  font-size: 0.875rem; /* Font size for input */
+  width: 100%; /* Full width of the container */
+  padding-right: 80px; /* Space for the button */
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+.animated-gradient-border-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 140px; /* Adjust width as needed */
+  padding: 10px; /* Adjust padding to match the input field size */
+  font-size: 13px; /* Font size for button */
+  font-weight: bold;
+  color: white;
+  border: 2px solid transparent; /* Border thickness */
+  border-radius: 0 4px 4px 0; /* Rounded only on the right side */
+  text-align: center;
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.3s ease;
+  background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc, #ffcc00);
+  background-size: 300%;
+  animation: animated-gradient 5s linear infinite;
+}
+
+.animated-gradient-border-btn:hover {
+  background-size: 400%;
+}
+
+@keyframes animated-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

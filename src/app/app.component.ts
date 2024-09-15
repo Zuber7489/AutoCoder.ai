@@ -17,11 +17,14 @@ export class AppComponent {
   iframeSrc: SafeResourceUrl | null = null;
   isLoading: boolean = false;
   copied: boolean = false;
+  askmeanything:boolean=true;
   constructor(private geminiApi: GeminiApiService,private sanitizer: DomSanitizer,private clipboard: Clipboard) {}
 
   async generateCode() {
+    this.askmeanything=false;
     this.isLoading = true;
     try {
+
       // Call the generateContent method with the user prompt
       let response = await this.geminiApi.generateCode(this.prompt);
 
@@ -32,8 +35,10 @@ export class AppComponent {
          this.generatedContent = response;
          this.updateIframe(response);
     } catch (error) {
+      this.askmeanything=false;
       console.error('Error generating code:', error);
     } finally {
+      this.askmeanything=false;
       this.isLoading = false;
     }
   }
