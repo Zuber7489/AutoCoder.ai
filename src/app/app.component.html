@@ -1,57 +1,159 @@
-<div class="container mx-auto px-4 py-8">
+<!-- Preview Section for HTML/CSS -->
+<div *ngIf="showPreview && iframeSrc" class="mt-8">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Live Preview</h2>
+    <div class="relative w-full rounded-lg overflow-hidden bg-white preview-wrapper">
+      <!-- Preview Controls -->
+      <div class="flex items-center justify-end gap-2 mb-2">
+        <button
+          (click)="iframeFullscreen()"
+          class="text-sm px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 
+                 hover:bg-gray-300 dark:hover:bg-gray-600
+                 text-gray-800 dark:text-gray-200 
+                 focus:outline-none"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Responsive Preview Wrapper -->
+      <div class="relative w-full preview-transition" style="padding-top: 56.25%"> <!-- 16:9 Aspect Ratio -->
+        <iframe
+          [src]="iframeSrc"
+          class="absolute top-0 left-0 w-full h-full border-0 rounded-lg bg-white"
+          sandbox="allow-scripts allow-same-origin"
+          loading="lazy"
+        ></iframe>
+      </div>
+
+      <!-- Preview Size Controls -->
+      <div class="flex items-center justify-center gap-4 mt-4">
+        <button
+          *ngFor="let size of ['Mobile', 'Tablet', 'Desktop']"
+          (click)="setPreviewSize(size.toLowerCase())"
+          class="text-sm px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 
+                 hover:bg-gray-300 dark:hover:bg-gray-600
+                 text-gray-800 dark:text-gray-200 
+                 focus:outline-none"
+          [class.bg-blue-500]="currentPreviewSize === size.toLowerCase()"
+          [class.text-white]="currentPreviewSize === size.toLowerCase()"
+        >
+          {{size}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div><div class="min-h-screen" [ngClass]="{'dark': isDarkMode}">
   <!-- Navbar -->
-  <nav class="bg-gray-800 text-white p-4 fixed top-0 left-0 w-full z-50 shadow-md">
+  <nav class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-4 fixed top-0 left-0 w-full z-50 shadow-md">
     <div class="container mx-auto flex justify-between items-center">
-      <a href="#" class="text-xl font-bold">AutoCoder.ai</a>
-      <div class="space-x-4">
-        <!-- <a href="#home" class="hover:">Home</a> -->
-        <!-- <button type="button" class="text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-6 py-2.5 text-center me-1 mb-2 mt-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Logout</button> -->
-     
+      <a href="#" class="text-xl font-bold flex items-center">
+        <span class="text-blue-600 dark:text-blue-400">Auto</span>Coder.ai
+      </a>
+      <div class="flex items-center space-x-4">
+        <button (click)="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+          <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+          <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
       </div>
     </div>
   </nav>
 
   <!-- Main Content -->
-  <div class="pt-20" > <!-- Add padding to avoid content being hidden under the navbar -->
-    
-    <h1
-    class="text-3xl sm:text-4xl font-bold text-black-600 mb-8 text-center"
-    style="display: flex; justify-content: center; align-items: center; height: 50vh; margin: 0; color: #1F2937;" *ngIf="askmeanything">
-    Ask Me Anything...
-</h1>
-
-
-
-
-    <div *ngIf="!isLoading && generatedContent" class="bg-black shadow-xl rounded-lg p-4 sm:p-8 mx-2 sm:mx-4 lg:mx-16">
-      <!-- Sticky Copy Bar -->
-      <div class=" top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center p-4 shadow-lg z-50">
-        <span class="text-lg font-semibold">Generated Code</span>
-        <button (click)="copyToClipboard()" class="bg-blue-600 text-white py-1 px-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
-          <span *ngIf="!copied" class="text-danger">Copy</span>
-          <span *ngIf="copied" class="text-danger">Copied!</span>
+  <div class="container mx-auto px-4 pt-20">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Input Section -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Code Requirements</h2>
+        <div class="mb-4">
+          <select [(ngModel)]="selectedLanguage" 
+                  class="w-full p-2 border rounded bg-white dark:bg-gray-700 
+                         text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600">
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+          </select>
+        </div>
+        <textarea
+          [(ngModel)]="prompt"
+          class="w-full h-48 p-3 border rounded resize-none 
+                 bg-white dark:bg-gray-700 
+                 text-gray-800 dark:text-gray-100
+                 border-gray-300 dark:border-gray-600
+                 focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+          placeholder="Describe what code you want to generate..."
+        ></textarea>
+        <button
+          (click)="generateCode()"
+          class="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded 
+                 hover:bg-blue-700 dark:hover:bg-blue-500
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                 focus:ring-opacity-50 disabled:opacity-50"
+          [disabled]="isLoading"
+        >
+          {{ isLoading ? 'Generating...' : 'Generate Code' }}
         </button>
       </div>
-      <pre id="codeBlock" class="p-4 sm:p-6 rounded-lg overflow-x-auto bg-black text-green-400">{{ generatedContent }}</pre>
+
+      <!-- Output Section -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Generated Code</h2>
+          <button
+            *ngIf="generatedContent"
+            (click)="copyToClipboard()"
+            class="text-sm px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 
+                   hover:bg-gray-300 dark:hover:bg-gray-600 
+                   text-gray-800 dark:text-gray-200
+                   focus:outline-none"
+          >
+            {{ copied ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+        <div class="relative">
+          <pre *ngIf="generatedContent" 
+               class="language-{{selectedLanguage}} rounded-lg 
+                      dark:bg-gray-900 overflow-x-auto"><code [innerHTML]="highlightedCode"></code></pre>
+          <div *ngIf="!generatedContent" 
+               class="text-gray-500 dark:text-gray-400 text-center py-12">
+            Generated code will appear here
+          </div>
+        </div>
+      </div>
     </div>
 
-    <iframe [src]="iframeSrc" *ngIf="iframeSrc && !isLoading" class="w-full sm:w-[1060px] h-[300px] sm:h-[500px] shadow-xl rounded-lg p-4 sm:p-8 mx-2 sm:mx-4 lg:mx-16"></iframe>
-  </div>
-
-  <!-- Fixed Form at Bottom -->
-  <form (ngSubmit)="generateCode()" class="fixed-form">
-    <div class="input-container">
-      <input type="text" [(ngModel)]="prompt" name="prompt" required
-        class="search-input"
-        placeholder="Ask me anything..."/>
-      <button type="submit" class="animated-gradient-border-btn" [disabled]="isLoading">
-        <span *ngIf="!isLoading">Generate Code</span>
-        <span *ngIf="isLoading" class="text-danger">loading...</span>
-      </button>
+    <!-- History Panel -->
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">History</h2>
+      <div class="space-y-4">
+        <div *ngFor="let item of history" 
+             class="border-b border-gray-200 dark:border-gray-700 pb-4">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm text-gray-600 dark:text-gray-400">{{item.timestamp | date:'medium'}}</p>
+              <p class="mt-1 text-gray-800 dark:text-gray-200">{{item.prompt}}</p>
+            </div>
+            <button
+              (click)="loadFromHistory(item)"
+              class="text-sm px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 
+                     hover:bg-gray-300 dark:hover:bg-gray-600
+                     text-gray-800 dark:text-gray-200 
+                     focus:outline-none"
+            >
+              Load
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  </form>
-
-  <div *ngIf="isLoading" class="flex justify-center items-center h-[300px] sm:h-[500px] mt-[-50px] sm:mt-[-100px]">
-    <div class="spinner-border animate-spin inline-block w-12 sm:w-16 h-12 sm:h-16 border-4 rounded-full border-blue-600 border-t-transparent"></div>
   </div>
 </div>
