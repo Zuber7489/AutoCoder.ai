@@ -85,6 +85,8 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   showSidebar: boolean = window.innerWidth >= 1024; // Start open on desktop, closed on mobile
   isFullscreen: boolean = false;
   autoScroll: boolean = true;
+  showScrollToBottom: boolean = false;
+  isUserScrolling: boolean = false;
   
   // Enhanced quick examples with categories
   quickExamples: QuickExample[] = [
@@ -250,8 +252,14 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   }
 
   ngAfterViewChecked() {
-    if (this.autoScroll) {
+    // Only auto-scroll if not user scrolling and auto-scroll is enabled
+    if (this.autoScroll && !this.isUserScrolling) {
       this.scrollToBottom();
+    }
+    
+    // Set up scroll listener if not already done
+    if (this.chatContainer?.nativeElement && !this.chatContainer.nativeElement.onscroll) {
+      this.setupScrollListener();
     }
   }
 
@@ -281,6 +289,8 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     this.isLoading = true;
 
     // Force scroll to bottom after adding user message
+    this.isUserScrolling = false; // Ensure auto-scroll works
+    this.autoScroll = true;
     setTimeout(() => this.scrollToBottom(), 100);
 
     try {
@@ -610,7 +620,52 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
         top: container.scrollHeight,
         behavior: 'smooth'
       });
+      
+      // Hide scroll to bottom button when at bottom
+      this.showScrollToBottom = false;
     }
+  }
+  
+  // Set up scroll event listener to detect user scrolling
+  private setupScrollListener() {
+    if (this.chatContainer?.nativeElement) {
+      const container = this.chatContainer.nativeElement;
+      
+      container.addEventListener('scroll', () => {
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50; // 50px threshold
+        
+        // If user scrolls up from bottom, disable auto-scroll and show button
+        if (!isAtBottom && this.autoScroll) {
+          this.isUserScrolling = true;
+          this.showScrollToBottom = true;
+          
+          // Re-enable auto-scroll after a delay if user stops scrolling
+          clearTimeout(this.scrollTimeout);
+          this.scrollTimeout = setTimeout(() => {
+            // Check if still not at bottom
+            const currentIsAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 50;
+            if (!currentIsAtBottom) {
+              this.showScrollToBottom = true;
+            }
+          }, 500);
+        } else if (isAtBottom) {
+          // User scrolled back to bottom, re-enable auto-scroll
+          this.isUserScrolling = false;
+          this.showScrollToBottom = false;
+          clearTimeout(this.scrollTimeout);
+        }
+      });
+    }
+  }
+  
+  private scrollTimeout: any;
+  
+  // Method to manually scroll to bottom
+  scrollToBottomManually() {
+    this.isUserScrolling = false;
+    this.autoScroll = true;
+    this.scrollToBottom();
   }
 
   private saveChatHistory() {
@@ -1061,32 +1116,58 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       // Create a complete HTML document
       const fullHtmlContent = this.createFullHtmlDocument(code);
       
-      // Create blob URL
-      const blob = new Blob([fullHtmlContent], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      
-      // Open in new tab
-      const newWindow = window.open(url, '_blank');
-      
-      if (newWindow) {
-        // Clean up blob URL after the window loads
-        newWindow.addEventListener('load', () => {
-          setTimeout(() => {
-            URL.revokeObjectURL(url);
-          }, 1000);
-        });
-      } else {
-        // Fallback if popup blocked - try direct approach
-        const newTab = window.open('', '_blank');
-        if (newTab) {
+      // Try direct document.write approach first (more reliable)
+      const newTab = window.open('', '_blank');
+      if (newTab) {
+        try {
           newTab.document.open();
           newTab.document.write(fullHtmlContent);
           newTab.document.close();
           newTab.document.title = 'AutoCoder.ai - Live Preview';
-        } else {
-          alert('Please allow popups to view the live preview in a new tab.');
+          
+          // Show success message
+          this.addSystemMessage('✅ Live preview opened in a new tab!');
+          return;
+        } catch (writeError) {
+          console.warn('Document.write failed, trying blob URL approach:', writeError);
+          newTab.close();
         }
-        URL.revokeObjectURL(url);
+      }
+      
+      // Fallback to blob URL approach
+      try {
+        const blob = new Blob([fullHtmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        const blobWindow = window.open(url, '_blank');
+        if (blobWindow) {
+          // Clean up blob URL after delay
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 5000);
+          
+          this.addSystemMessage('✅ Live preview opened in a new tab!');
+        } else {
+          URL.revokeObjectURL(url);
+          throw new Error('Popup blocked');
+        }
+      } catch (blobError) {
+        console.warn('Blob URL approach failed:', blobError);
+        
+        // Final fallback - create a data URL (limited size but more compatible)
+        try {
+          const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(fullHtmlContent);
+          const dataWindow = window.open(dataUrl, '_blank');
+          
+          if (dataWindow) {
+            this.addSystemMessage('✅ Live preview opened in a new tab!');
+          } else {
+            throw new Error('All approaches failed');
+          }
+        } catch (dataError) {
+          console.error('All preview methods failed:', dataError);
+          alert('Unable to open preview. Please check if popups are blocked or try copying the code manually.');
+        }
       }
     } catch (error) {
       console.error('Error opening preview:', error);

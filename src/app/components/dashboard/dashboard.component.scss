@@ -735,6 +735,7 @@
   flex-direction: column;
   gap: 1.5rem;
   min-height: 0;
+  position: relative;
   
   &::-webkit-scrollbar {
     width: 6px;
@@ -751,6 +752,46 @@
     
     &:hover {
       background: rgba(148, 163, 184, 0.5);
+    }
+  }
+}
+
+// Scroll to Bottom Button
+.scroll-to-bottom-btn {
+  position: fixed;
+  bottom: 140px;
+  right: 2rem;
+  z-index: 30;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  
+  &:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+  
+  i {
+    font-size: 1.125rem;
+  }
+  
+  @media (max-width: 768px) {
+    bottom: 120px;
+    right: 1rem;
+    width: 44px;
+    height: 44px;
+    
+    i {
+      font-size: 1rem;
     }
   }
 }

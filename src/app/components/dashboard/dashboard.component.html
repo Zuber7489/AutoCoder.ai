@@ -214,6 +214,14 @@
 
     <!-- Chat Container -->
     <div class="chat-container" #chatContainer>
+      <!-- Scroll to Bottom Button -->
+      <button 
+        *ngIf="showScrollToBottom" 
+        class="scroll-to-bottom-btn" 
+        (click)="scrollToBottomManually()"
+        title="Scroll to bottom">
+        <i class="fas fa-chevron-down"></i>
+      </button>
       <!-- Welcome Message -->
       <div *ngIf="conversation.length === 0" class="welcome-message">
         <div class="welcome-icon">
