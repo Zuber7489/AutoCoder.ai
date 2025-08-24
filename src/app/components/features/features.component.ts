@@ -10,37 +10,37 @@ export class FeaturesComponent {
   
   features = [
     {
-      icon: '🚀',
+      icon: 'fas fa-rocket',
       title: 'Lightning Fast Generation',
       description: 'Generate production-ready code in seconds with our advanced Gemini 2.0 Flash model',
       benefits: ['Sub-second response times', 'Optimized for speed', 'Real-time suggestions']
     },
     {
-      icon: '🎨',
+      icon: 'fas fa-palette',
       title: 'Multi-Language Support',
       description: 'Support for all major programming languages and frameworks',
       benefits: ['JavaScript/TypeScript', 'Python', 'HTML/CSS', 'React/Vue/Angular']
     },
     {
-      icon: '👁️',
+      icon: 'fas fa-eye',
       title: 'Live Preview',
       description: 'See your code come to life instantly with integrated preview',
       benefits: ['Real-time rendering', 'Responsive design testing', 'Fullscreen mode']
     },
     {
-      icon: '🔧',
+      icon: 'fas fa-cogs',
       title: 'Code Optimization',
       description: 'AI-powered code optimization and best practices',
       benefits: ['Performance optimization', 'Security best practices', 'Clean code standards']
     },
     {
-      icon: '📱',
+      icon: 'fas fa-mobile-alt',
       title: 'Responsive Design',
       description: 'Generate responsive layouts that work on all devices',
       benefits: ['Mobile-first approach', 'Cross-browser compatibility', 'Modern CSS Grid/Flexbox']
     },
     {
-      icon: '⚡',
+      icon: 'fas fa-bolt',
       title: 'Instant Deployment',
       description: 'Deploy your generated code instantly to the cloud',
       benefits: ['One-click deployment', 'CDN integration', 'Custom domains']

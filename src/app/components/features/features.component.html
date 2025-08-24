@@ -21,8 +21,8 @@
           class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 hover:transform hover:-translate-y-2 group"
         >
           <!-- Icon -->
-          <div class="text-4xl mb-6 group-hover:scale-110 transition-transform duration-300">
-            {{feature.icon}}
+          <div class="text-4xl mb-6 group-hover:scale-110 transition-transform duration-300 text-blue-400">
+            <i class="{{feature.icon}}"></i>
           </div>
           
           <!-- Title -->
@@ -81,7 +81,7 @@
           (click)="navigateToLogin()"
           class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
         >
-          🚀 Start Free Trial
+          <i class="fas fa-rocket mr-2"></i>Start Free Trial
         </button>
         <button 
           (click)="navigateToPricing()"
