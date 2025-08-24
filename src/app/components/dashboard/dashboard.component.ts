@@ -157,6 +157,8 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   userProfilePic: string = '';
   userDisplayName: string = '';
   userEmail: string = '';
+  showProfileModal: boolean = false;
+  userInfo: any = null;
 
   // Language options with icons
   languages = [
@@ -1153,6 +1155,7 @@ ${htmlContent}
   private initializeUserProfile() {
     const userInfo = this.authService.getUserInfo();
     if (userInfo) {
+      this.userInfo = userInfo;
       this.userDisplayName = userInfo.displayName || userInfo.email?.split('@')[0] || 'User';
       this.userEmail = userInfo.email || 'Guest';
       this.userProfilePic = userInfo.photoURL || '';
@@ -1160,15 +1163,52 @@ ${htmlContent}
       // Subscribe to auth state changes
       this.authService.user$.subscribe(user => {
         if (user) {
+          this.userInfo = {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL
+          };
           this.userDisplayName = user.displayName || user.email?.split('@')[0] || 'User';
           this.userEmail = user.email || 'Guest';
           this.userProfilePic = user.photoURL || '';
         } else {
+          this.userInfo = null;
           this.userDisplayName = 'User';
           this.userEmail = 'Guest';
           this.userProfilePic = '';
         }
       });
+    }
+  }
+
+  openProfileModal() {
+    this.showProfileModal = true;
+  }
+
+  closeProfileModal() {
+    this.showProfileModal = false;
+  }
+
+  clearAllData() {
+    if (confirm('Are you sure you want to clear all app data? This will remove chat history, API keys, and other settings.')) {
+      // Clear all localStorage except authentication
+      const authData = localStorage.getItem('isAuthenticated');
+      const userInfo = localStorage.getItem('userInfo');
+      localStorage.clear();
+      if (authData) localStorage.setItem('isAuthenticated', authData);
+      if (userInfo) localStorage.setItem('userInfo', userInfo);
+      
+      // Reset component state
+      this.chatHistories = [];
+      this.chatMessages = [];
+      this.conversation = [];
+      this.currentChatId = '';
+      this.customApiKey = '';
+      this.hasCustomApiKey = false;
+      
+      this.addSystemMessage('✅ All data cleared successfully! Chat history and settings have been reset.');
+      this.closeProfileModal();
     }
   }
 
