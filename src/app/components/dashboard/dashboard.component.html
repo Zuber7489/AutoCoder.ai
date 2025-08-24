@@ -26,6 +26,58 @@
       </div>
     </div>
 
+    <!-- Chat History Section -->
+    <div class="chat-history">
+      <div class="chat-history-header">
+        <h3><i class="fas fa-history"></i> Chat History</h3>
+        <button class="new-chat-btn" (click)="startNewChat()" title="Start New Chat">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+      
+      <div class="chat-history-list">
+        <!-- Current Chat Indicator -->
+        <div *ngIf="chatHistories.length === 0" class="no-history">
+          <i class="fas fa-comments"></i>
+          <span>No chat history yet</span>
+        </div>
+        
+        <!-- Chat History Items -->
+        <div 
+          *ngFor="let chat of chatHistories; trackBy: trackByChatId" 
+          class="history-item"
+          [class.active]="chat.id === currentChatId"
+          (click)="switchToChat(chat.id)"
+          title="{{ chat.title }}">
+          
+          <div class="history-item-content">
+            <div class="history-item-header">
+              <div class="history-language">
+                <i [class]="getLanguageIcon(chat.language)"></i>
+              </div>
+              <div class="history-time">{{ getRelativeTime(chat.timestamp) }}</div>
+              <button 
+                class="delete-chat-btn" 
+                (click)="deleteChat(chat.id, $event)"
+                title="Delete Chat"
+                *ngIf="chatHistories.length > 1">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            
+            <div class="history-title">{{ chat.title }}</div>
+            <div class="history-preview">{{ chat.lastMessage }}</div>
+            
+            <div class="history-stats">
+              <span class="message-count">
+                <i class="fas fa-comment"></i> {{ chat.messages.length }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Quick Examples -->
     <div class="quick-examples">
       <h3><i class="fas fa-lightbulb"></i> Quick Examples</h3>

@@ -790,6 +790,11 @@ ${htmlContent}
     const language = this.languages.find(lang => lang.value === this.selectedLanguage);
     return language ? language.icon : 'fas fa-code';
   }
+  
+  getLanguageIcon(languageValue: string): string {
+    const language = this.languages.find(lang => lang.value === languageValue);
+    return language ? language.icon : 'fas fa-code';
+  }
 
   trackByMessageId(index: number, message: ChatMessage): string {
     return message.id;
