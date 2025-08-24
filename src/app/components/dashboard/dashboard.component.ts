@@ -366,6 +366,7 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
 
   clearChat() {
     this.chatMessages = [];
+    this.conversation = []; // Sync with template
     this.addSystemMessage('Chat cleared! Ready for a new conversation.');
     
     // Update the current chat in history
@@ -434,9 +435,10 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   
   // Show preview method - template expects this to be a method, not a property
   showPreviewMethod(content: string) {
-    if (this.containsCode(content)) {
+    if (content && (content.includes('<') || content.includes('html') || content.includes('css'))) {
       this.previewContent = content;
       this.showPreviewModal = true;
+      console.log('Opening preview with content:', content.substring(0, 100) + '...');
     }
   }
   
@@ -521,12 +523,15 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     // Create new chat session
     this.currentChatId = this.generateId();
     this.chatMessages = [];
+    this.conversation = []; // Sync with template
     this.selectedLanguage = 'html';
     
     // Add welcome message
     this.addSystemMessage('Welcome to AutoCoder.ai! I\'m here to help you generate beautiful, functional code. What would you like to build today?');
     
     localStorage.setItem('currentChatId', this.currentChatId);
+    
+    console.log('Started new chat:', this.currentChatId);
   }
 
   switchToChat(chatId: string) {
@@ -540,8 +545,12 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     if (selectedChat) {
       this.currentChatId = chatId;
       this.chatMessages = [...selectedChat.messages];
+      this.conversation = [...selectedChat.messages]; // Sync with template
       this.selectedLanguage = selectedChat.language;
       localStorage.setItem('currentChatId', this.currentChatId);
+      
+      console.log('Switched to chat:', selectedChat);
+      console.log('Messages loaded:', this.chatMessages);
       
       // Scroll to bottom after switching
       setTimeout(() => this.scrollToBottom(), 100);

@@ -167,17 +167,26 @@
           
           <!-- Display generated code if available -->
           <div *ngIf="message.code" class="generated-code">
-            <pre><code [innerHTML]="message.code"></code></pre>
+            <div class="code-header">
+              <span class="code-language">
+                <i [class]="getLanguageIcon(message.language || selectedLanguage)"></i>
+                {{ message.language || selectedLanguage }}
+              </span>
+              <button class="copy-code-btn" (click)="copyToClipboard(message.code)" title="Copy Code">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+            <pre><code class="hljs" [innerHTML]="message.code"></code></pre>
           </div>
           
           <!-- Action Buttons for Assistant Messages -->
           <div *ngIf="message.role === 'assistant'" class="message-actions">
-            <button class="action-btn-sm" (click)="copyToClipboard(message.content)" title="Copy">
+            <button class="action-btn-sm" (click)="copyToClipboard(message.code || message.content)" title="Copy">
               <i class="fas fa-copy"></i>
             </button>
-            <button *ngIf="containsCode(message.content)" 
+            <button *ngIf="message.code" 
                     class="action-btn-sm" 
-                    (click)="showPreviewMethod(message.content)" 
+                    (click)="showPreviewMethod(message.code)" 
                     title="Live Preview">
               <i class="fas fa-eye"></i>
             </button>
