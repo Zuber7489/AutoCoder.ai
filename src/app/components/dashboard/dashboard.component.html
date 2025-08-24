@@ -78,7 +78,7 @@
       </div>
     </div>
 
-    <!-- Quick Examples -->
+    <!-- Quick Examples - Hidden per user request
     <div class="quick-examples">
       <h3><i class="fas fa-lightbulb"></i> Quick Examples</h3>
       <div class="example-buttons">
@@ -92,15 +92,14 @@
         </button>
       </div>
     </div>
+    -->
 
     <!-- Chat Actions -->
     <div class="chat-actions">
       <button class="action-btn" (click)="clearChat()" [disabled]="isLoading">
         <i class="fas fa-trash"></i> Clear Chat
       </button>
-      <button class="action-btn" (click)="exportChat()" [disabled]="conversation.length === 0">
-        <i class="fas fa-download"></i> Export Chat
-      </button>
+      <!-- Export Chat button removed per user request -->
     </div>
   </div>
 
@@ -165,6 +164,11 @@
           </div>
           
           <div class="message-text" [innerHTML]="message.content"></div>
+          
+          <!-- Display generated code if available -->
+          <div *ngIf="message.code" class="generated-code">
+            <pre><code [innerHTML]="message.code"></code></pre>
+          </div>
           
           <!-- Action Buttons for Assistant Messages -->
           <div *ngIf="message.role === 'assistant'" class="message-actions">

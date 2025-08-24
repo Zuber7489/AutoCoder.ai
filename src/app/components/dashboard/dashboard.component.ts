@@ -298,6 +298,9 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       this.chatMessages.push(responseMessage);
       this.conversation = [...this.chatMessages]; // Sync with template
       
+      console.log('Generated code:', generatedCode); // Debug log
+      console.log('Response message:', responseMessage); // Debug log
+      
       // Update legacy properties for compatibility
       this.generatedContent = generatedCode;
       this.prompt = messageToProcess;
