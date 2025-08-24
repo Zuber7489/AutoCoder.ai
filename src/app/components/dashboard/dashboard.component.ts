@@ -153,6 +153,11 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   showApiConfig: boolean = false;
   showApiKey: boolean = false;
 
+  // User Profile Properties
+  userProfilePic: string = '';
+  userDisplayName: string = '';
+  userEmail: string = '';
+
   // Language options with icons
   languages = [
     { value: 'html', label: 'HTML + CSS', icon: 'fab fa-html5' },
@@ -220,6 +225,9 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     if (!isAuthenticated) {
       this.router.navigate(['/login']);
     }
+
+    // Initialize user profile data
+    this.initializeUserProfile();
 
     // Handle responsive sidebar
     this.updateSidebarState();
@@ -1139,5 +1147,32 @@ ${htmlContent}
     
     // Show info message
     this.addSystemMessage('🔄 Switched back to default API key.');
+  }
+
+  // User Profile Methods
+  private initializeUserProfile() {
+    const userInfo = this.authService.getUserInfo();
+    if (userInfo) {
+      this.userDisplayName = userInfo.displayName || userInfo.email?.split('@')[0] || 'User';
+      this.userEmail = userInfo.email || 'Guest';
+      this.userProfilePic = userInfo.photoURL || '';
+    } else {
+      // Subscribe to auth state changes
+      this.authService.user$.subscribe(user => {
+        if (user) {
+          this.userDisplayName = user.displayName || user.email?.split('@')[0] || 'User';
+          this.userEmail = user.email || 'Guest';
+          this.userProfilePic = user.photoURL || '';
+        } else {
+          this.userDisplayName = 'User';
+          this.userEmail = 'Guest';
+          this.userProfilePic = '';
+        }
+      });
+    }
+  }
+
+  navigateToSettings() {
+    this.router.navigate(['/settings']);
   }
 }

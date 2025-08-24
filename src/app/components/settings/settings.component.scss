@@ -1,0 +1,369 @@
+.settings-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #f8fafc;
+}
+
+.settings-header {
+  padding: 2rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  .back-btn {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    color: #3b82f6;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+
+    &:hover {
+      background: rgba(59, 130, 246, 0.2);
+      transform: translateY(-1px);
+    }
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    i {
+      color: #3b82f6;
+      -webkit-text-fill-color: #3b82f6;
+    }
+  }
+}
+
+.settings-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.settings-section {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #e2e8f0;
+
+    i {
+      color: #3b82f6;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Profile Card Styles
+.profile-card {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 3px solid rgba(59, 130, 246, 0.3);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-fallback {
+  color: #ffffff;
+  font-size: 2rem;
+}
+
+.profile-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.profile-item {
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-bottom: 0.25rem;
+  }
+
+  .profile-value {
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 500;
+    
+    &.user-id {
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 0.875rem;
+      color: #94a3b8;
+      word-break: break-all;
+    }
+  }
+}
+
+.no-user-info {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+
+  i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #475569;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+// Settings Grid
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(15, 23, 42, 0.7);
+  }
+}
+
+.setting-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  i {
+    color: #3b82f6;
+    font-size: 1.25rem;
+    width: 20px;
+    text-align: center;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f8fafc;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #94a3b8;
+  }
+}
+
+.setting-control {
+  .status-badge {
+    background: rgba(100, 116, 139, 0.2);
+    color: #94a3b8;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+
+    &.active {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+  }
+}
+
+// Action Buttons
+.data-actions,
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: flex-start;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: translateY(-1px);
+  }
+
+  &.danger {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+  }
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1rem 2rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  align-self: flex-start;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.action-description,
+.logout-description {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .settings-header {
+    padding: 1rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .settings-content {
+    padding: 1rem;
+  }
+
+  .settings-section {
+    padding: 1.5rem;
+  }
+
+  .profile-card {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .setting-control {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-header {
+    .back-btn {
+      padding: 0.5rem;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+    }
+  }
+
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .avatar-fallback {
+    font-size: 1.5rem;
+  }
+}

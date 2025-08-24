@@ -173,6 +173,33 @@
       </button>
       <!-- Export Chat button removed per user request -->
     </div>
+
+    <!-- User Profile Section -->
+    <div class="user-profile-section" (click)="navigateToSettings()">
+      <div class="profile-container">
+        <div class="profile-avatar">
+          <img 
+            *ngIf="userProfilePic" 
+            [src]="userProfilePic" 
+            [alt]="userDisplayName || 'User'"
+            class="profile-image"
+            onerror="this.style.display='none'"
+          />
+          <div 
+            *ngIf="!userProfilePic" 
+            class="profile-fallback">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name">{{ userDisplayName || 'User' }}</div>
+          <div class="profile-email">{{ userEmail || 'Guest' }}</div>
+        </div>
+        <div class="profile-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Main Content -->
