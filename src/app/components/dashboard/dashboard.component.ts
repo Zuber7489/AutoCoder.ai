@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { GeminiApiService } from '../../gemini-api.service';
 import { AuthService } from '../../services/auth.service';
@@ -46,7 +46,8 @@ interface QuickExample {
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
@@ -170,6 +171,9 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
   private scrollThrottleTimeout: any;
   private isScrolling: boolean = false;
   private scrollListenerAttached: boolean = false;
+  
+  // Code highlighting cache to improve performance
+  private highlightCache: Map<string, string> = new Map();
 
   // Language options with icons
   languages = [
@@ -274,6 +278,10 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
       container.removeEventListener('scroll', this.throttledScrollHandler.bind(this));
       this.scrollListenerAttached = false;
     }
+    
+    // Clear caches to prevent memory leaks
+    this.relativeTimeCache.clear();
+    this.highlightCache.clear();
   }
 
   private updateSidebarState() {
@@ -323,6 +331,9 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.currentMessage = '';
     this.userInput = ''; // Clear template input
     this.isLoading = true;
+    
+    // Trigger change detection for OnPush
+    this.cdr.markForCheck();
 
     // Force scroll to bottom after adding user message
     this.isUserScrolling = false; // Ensure auto-scroll works
@@ -387,6 +398,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
     } finally {
       this.isLoading = false;
       this.saveChatHistory();
+      // Trigger change detection for OnPush
+      this.cdr.markForCheck();
     }
   }
 
@@ -425,6 +438,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (this.currentChatId) {
       this.updateCurrentChatInHistory();
     }
+    
+    this.cdr.markForCheck(); // Trigger change detection for OnPush
   }
 
   useQuickExample(example: QuickExample) {
@@ -580,6 +595,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
   toggleSidebar() {
     this.showSidebar = !this.showSidebar;
     this.sidebarVisible = this.showSidebar;
+    this.cdr.markForCheck(); // Trigger change detection for OnPush
   }
 
   private generateId(): string {
@@ -1073,18 +1089,39 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
     return language ? language.icon : 'fas fa-code';
   }
   
-  // Get highlighted code for display
+  // Get highlighted code for display with caching for better performance
   getHighlightedCode(code: string, language?: string): string {
     if (!code) return '';
     
+    const lang = language || this.selectedLanguage;
+    const cacheKey = `${lang}:${code.length}:${code.substring(0, 100)}`; // Use length and first 100 chars as key
+    
+    // Return cached result if available
+    if (this.highlightCache.has(cacheKey)) {
+      return this.highlightCache.get(cacheKey)!;
+    }
+    
     try {
-      const lang = language || this.selectedLanguage;
       const highlighted = hljs.highlight(code, { language: lang }).value;
+      // Cache the result
+      this.highlightCache.set(cacheKey, highlighted);
+      
+      // Limit cache size to prevent memory leaks
+      if (this.highlightCache.size > 100) {
+        const iterator = this.highlightCache.keys();
+        const firstEntry = iterator.next();
+        if (!firstEntry.done) {
+          this.highlightCache.delete(firstEntry.value);
+        }
+      }
+      
       return highlighted;
     } catch (error) {
       console.log('Highlighting failed, using plain text:', error);
       // Return HTML-escaped code if highlighting fails
-      return code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      this.highlightCache.set(cacheKey, escapedCode);
+      return escapedCode;
     }
   }
 
