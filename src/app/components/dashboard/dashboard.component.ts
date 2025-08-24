@@ -15,6 +15,7 @@ interface HistoryItem {
 interface ChatMessage {
   id: string;
   type: 'user' | 'assistant' | 'system';
+  role: 'user' | 'assistant' | 'system'; // Template compatibility
   content: string;
   timestamp: Date;
   code?: string;
@@ -22,6 +23,15 @@ interface ChatMessage {
   isLoading?: boolean;
   suggestions?: string[];
   explanation?: string;
+}
+
+interface ChatHistory {
+  id: string;
+  title: string;
+  timestamp: Date;
+  messages: ChatMessage[];
+  lastMessage: string;
+  language: string;
 }
 
 interface QuickExample {
@@ -46,6 +56,18 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   currentMessage: string = '';
   isLoading: boolean = false;
   selectedLanguage: string = 'html';
+  
+  // Template compatibility properties
+  conversation: ChatMessage[] = [];
+  userInput: string = '';
+  sidebarVisible: boolean = false;
+  showPreviewModal: boolean = false;
+  previewContent: string = '';
+  
+  // Chat history properties
+  chatHistories: ChatHistory[] = [];
+  currentChatId: string = '';
+  showHistoryPanel: boolean = true;
   
   // Legacy properties for compatibility
   generatedContent: string = '';
@@ -147,14 +169,37 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       this.history = JSON.parse(savedHistory);
     }
 
-    // Load chat history
-    const savedChat = localStorage.getItem('chatHistory');
-    if (savedChat) {
-      this.chatMessages = JSON.parse(savedChat);
-    } else {
-      // Add welcome message
-      this.addSystemMessage('Welcome to AutoCoder.ai! I\'m here to help you generate beautiful, functional code. What would you like to build today?');
+    // Load chat histories
+    const savedChatHistories = localStorage.getItem('chatHistories');
+    if (savedChatHistories) {
+      this.chatHistories = JSON.parse(savedChatHistories).map((chat: any) => ({
+        ...chat,
+        timestamp: new Date(chat.timestamp),
+        messages: chat.messages.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }))
+      }));
     }
+
+    // Load or create current chat
+    const currentChatId = localStorage.getItem('currentChatId');
+    if (currentChatId && this.chatHistories.find(chat => chat.id === currentChatId)) {
+      this.currentChatId = currentChatId;
+      const currentChat = this.chatHistories.find(chat => chat.id === currentChatId);
+      if (currentChat) {
+        this.chatMessages = currentChat.messages;
+        this.selectedLanguage = currentChat.language;
+      }
+    } else {
+      // Create new chat session
+      this.startNewChat();
+    }
+    
+    // Initialize template compatibility properties
+    this.conversation = this.chatMessages;
+    this.userInput = this.currentMessage;
+    this.sidebarVisible = window.innerWidth >= 768;
   }
 
   ngOnInit() {
@@ -167,13 +212,19 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     // Handle responsive sidebar
     this.updateSidebarState();
     window.addEventListener('resize', () => this.updateSidebarState());
+    
+    // Sync template properties
+    this.conversation = this.chatMessages;
+    this.userInput = this.currentMessage;
   }
 
   private updateSidebarState() {
     if (window.innerWidth < 1024) {
       this.showSidebar = false; // Hide on mobile/tablet
+      this.sidebarVisible = false;
     } else {
       this.showSidebar = true; // Show on desktop
+      this.sidebarVisible = true;
     }
   }
 
@@ -185,18 +236,27 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
 
   // Chat methods
   async sendMessage() {
+    // Sync input properties
+    if (this.userInput && !this.currentMessage) {
+      this.currentMessage = this.userInput;
+    }
+    
     if (!this.currentMessage.trim() || this.isLoading) return;
 
     const userMessage: ChatMessage = {
       id: this.generateId(),
       type: 'user',
+      role: 'user',
       content: this.currentMessage,
       timestamp: new Date()
     };
 
     this.chatMessages.push(userMessage);
+    this.conversation = [...this.chatMessages]; // Sync with template property
+    
     const messageToProcess = this.currentMessage;
     this.currentMessage = '';
+    this.userInput = ''; // Clear template input
     this.isLoading = true;
 
     // Force scroll to bottom after adding user message
@@ -206,11 +266,13 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     const loadingMessage: ChatMessage = {
       id: this.generateId(),
       type: 'assistant',
+      role: 'assistant',
       content: 'Generating your code...',
       timestamp: new Date(),
       isLoading: true
     };
     this.chatMessages.push(loadingMessage);
+    this.conversation = [...this.chatMessages]; // Sync with template
     this.saveChatHistory();
 
     // Force scroll to bottom after adding loading message
@@ -226,6 +288,7 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       const responseMessage: ChatMessage = {
         id: this.generateId(),
         type: 'assistant',
+        role: 'assistant',
         content: `I've generated a ${this.selectedLanguage} solution for you:`,
         code: generatedCode,
         language: this.selectedLanguage,
@@ -233,6 +296,7 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       };
       
       this.chatMessages.push(responseMessage);
+      this.conversation = [...this.chatMessages]; // Sync with template
       
       // Update legacy properties for compatibility
       this.generatedContent = generatedCode;
@@ -259,10 +323,12 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       const errorMessage: ChatMessage = {
         id: this.generateId(),
         type: 'assistant',
+        role: 'assistant',
         content: 'Sorry, I encountered an error generating your code. Please try again with a different prompt.',
         timestamp: new Date()
       };
       this.chatMessages.push(errorMessage);
+      this.conversation = [...this.chatMessages]; // Sync with template
     } finally {
       this.isLoading = false;
       this.saveChatHistory();
@@ -286,25 +352,140 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     const systemMessage: ChatMessage = {
       id: this.generateId(),
       type: 'system',
+      role: 'system',
       content,
       timestamp: new Date()
     };
     this.chatMessages.push(systemMessage);
+    this.conversation = [...this.chatMessages]; // Sync with template
     this.saveChatHistory();
   }
 
   clearChat() {
     this.chatMessages = [];
     this.addSystemMessage('Chat cleared! Ready for a new conversation.');
-    localStorage.removeItem('chatHistory');
+    
+    // Update the current chat in history
+    if (this.currentChatId) {
+      this.updateCurrentChatInHistory();
+    }
   }
 
   useQuickExample(example: QuickExample) {
     this.currentMessage = example.prompt;
+    this.userInput = example.prompt; // Sync with template
     this.selectedLanguage = example.language;
     if (this.messageInput?.nativeElement) {
       this.messageInput.nativeElement.focus();
     }
+  }
+  
+  // Template compatibility method
+  useExample(example: QuickExample) {
+    this.useQuickExample(example);
+  }
+  
+  // Export chat functionality
+  exportChat() {
+    const chatData = {
+      title: this.generateChatTitle(),
+      timestamp: new Date().toISOString(),
+      language: this.selectedLanguage,
+      messages: this.conversation.map(msg => ({
+        role: msg.type,
+        content: msg.content,
+        timestamp: msg.timestamp,
+        code: msg.code,
+        language: msg.language
+      }))
+    };
+    
+    const dataStr = JSON.stringify(chatData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `autocode-chat-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+  
+  // Template trackBy method
+  trackByMessage(index: number, message: ChatMessage): string {
+    return message.id;
+  }
+  
+  // Check if message contains code
+  containsCode(content: string): boolean {
+    return content.includes('<') && content.includes('>') || 
+           content.includes('function') || 
+           content.includes('class') ||
+           content.includes('const') ||
+           content.includes('let') ||
+           content.includes('var') ||
+           content.includes('{') && content.includes('}');
+  }
+  
+  // Show preview method - template expects this to be a method, not a property
+  showPreviewMethod(content: string) {
+    if (this.containsCode(content)) {
+      this.previewContent = content;
+      this.showPreviewModal = true;
+    }
+  }
+  
+  // Close preview modal
+  closePreview() {
+    this.showPreviewModal = false;
+    this.previewContent = '';
+  }
+  
+  // Regenerate response
+  async regenerateResponse(message: ChatMessage) {
+    if (message.type !== 'assistant') return;
+    
+    // Find the user message that preceded this assistant message
+    const messageIndex = this.conversation.findIndex(msg => msg.id === message.id);
+    if (messageIndex > 0) {
+      const userMessage = this.conversation[messageIndex - 1];
+      if (userMessage.type === 'user') {
+        // Remove the current assistant message
+        this.chatMessages = this.chatMessages.filter(msg => msg.id !== message.id);
+        this.conversation = [...this.chatMessages];
+        
+        // Set the user input and regenerate
+        this.currentMessage = userMessage.content;
+        await this.sendMessage();
+      }
+    }
+  }
+  
+  // Handle keyboard input
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage();
+    }
+  }
+  
+  // Auto-resize textarea
+  autoResize(event: any) {
+    const textarea = event.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+    
+    // Sync with userInput property
+    this.userInput = textarea.value;
+    this.currentMessage = textarea.value;
+  }
+  
+  // Toggle sidebar method - updated to sync both properties
+  toggleSidebar() {
+    this.showSidebar = !this.showSidebar;
+    this.sidebarVisible = this.showSidebar;
   }
 
   private generateId(): string {
@@ -324,6 +505,149 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
 
   private saveChatHistory() {
     localStorage.setItem('chatHistory', JSON.stringify(this.chatMessages));
+    this.saveChatHistories();
+  }
+
+  // Chat History Management Methods
+  startNewChat() {
+    // Save current chat if it has messages
+    if (this.chatMessages.length > 1 && this.currentChatId) {
+      this.updateCurrentChatInHistory();
+    }
+
+    // Create new chat session
+    this.currentChatId = this.generateId();
+    this.chatMessages = [];
+    this.selectedLanguage = 'html';
+    
+    // Add welcome message
+    this.addSystemMessage('Welcome to AutoCoder.ai! I\'m here to help you generate beautiful, functional code. What would you like to build today?');
+    
+    localStorage.setItem('currentChatId', this.currentChatId);
+  }
+
+  switchToChat(chatId: string) {
+    // Save current chat first
+    if (this.currentChatId && this.chatMessages.length > 0) {
+      this.updateCurrentChatInHistory();
+    }
+
+    // Switch to selected chat
+    const selectedChat = this.chatHistories.find(chat => chat.id === chatId);
+    if (selectedChat) {
+      this.currentChatId = chatId;
+      this.chatMessages = [...selectedChat.messages];
+      this.selectedLanguage = selectedChat.language;
+      localStorage.setItem('currentChatId', this.currentChatId);
+      
+      // Scroll to bottom after switching
+      setTimeout(() => this.scrollToBottom(), 100);
+    }
+  }
+
+  deleteChat(chatId: string, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    if (this.chatHistories.length <= 1) {
+      // Don't delete the last chat, just clear it
+      this.clearChat();
+      return;
+    }
+
+    this.chatHistories = this.chatHistories.filter(chat => chat.id !== chatId);
+    
+    if (this.currentChatId === chatId) {
+      // Switch to the most recent chat
+      const mostRecentChat = this.chatHistories[0];
+      if (mostRecentChat) {
+        this.switchToChat(mostRecentChat.id);
+      } else {
+        this.startNewChat();
+      }
+    }
+    
+    this.saveChatHistories();
+  }
+
+  private updateCurrentChatInHistory() {
+    if (!this.currentChatId || this.chatMessages.length === 0) return;
+
+    const existingChatIndex = this.chatHistories.findIndex(chat => chat.id === this.currentChatId);
+    const title = this.generateChatTitle();
+    const lastMessage = this.getLastUserMessage();
+
+    const chatHistory: ChatHistory = {
+      id: this.currentChatId,
+      title: title,
+      timestamp: new Date(),
+      messages: [...this.chatMessages],
+      lastMessage: lastMessage,
+      language: this.selectedLanguage
+    };
+
+    if (existingChatIndex >= 0) {
+      this.chatHistories[existingChatIndex] = chatHistory;
+    } else {
+      this.chatHistories.unshift(chatHistory);
+    }
+
+    // Keep only last 50 chats
+    if (this.chatHistories.length > 50) {
+      this.chatHistories = this.chatHistories.slice(0, 50);
+    }
+  }
+
+  private generateChatTitle(): string {
+    const userMessages = this.chatMessages.filter(msg => msg.type === 'user');
+    if (userMessages.length > 0) {
+      const firstMessage = userMessages[0].content;
+      // Truncate to 40 characters and add ellipsis
+      return firstMessage.length > 40 ? firstMessage.substring(0, 40) + '...' : firstMessage;
+    }
+    return 'New Chat';
+  }
+
+  private getLastUserMessage(): string {
+    const userMessages = this.chatMessages.filter(msg => msg.type === 'user');
+    if (userMessages.length > 0) {
+      return userMessages[userMessages.length - 1].content;
+    }
+    return '';
+  }
+
+  private saveChatHistories() {
+    // Update current chat in history before saving
+    if (this.currentChatId && this.chatMessages.length > 0) {
+      this.updateCurrentChatInHistory();
+    }
+    
+    localStorage.setItem('chatHistories', JSON.stringify(this.chatHistories));
+  }
+
+  toggleHistoryPanel() {
+    this.showHistoryPanel = !this.showHistoryPanel;
+  }
+
+  getRelativeTime(date: Date): string {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - new Date(date).getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return 'Just now';
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes}m ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours}h ago`;
+    } else if (diffInSeconds < 604800) {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days}d ago`;
+    } else {
+      return new Date(date).toLocaleDateString();
+    }
   }
 
   // Legacy methods for compatibility
@@ -451,10 +775,6 @@ ${htmlContent}
     }
   }
 
-  toggleSidebar() {
-    this.showSidebar = !this.showSidebar;
-  }
-
   setActiveTab(tab: string) {
     this.activeTab = tab;
   }
@@ -473,6 +793,10 @@ ${htmlContent}
 
   trackByMessageId(index: number, message: ChatMessage): string {
     return message.id;
+  }
+
+  trackByChatId(index: number, chat: ChatHistory): string {
+    return chat.id;
   }
 
   logout() {
