@@ -3,6 +3,134 @@
   backdrop-filter: blur(10px);
 }
 
+/* Fixed chat input area */
+.fixed {
+  position: fixed !important;
+}
+
+/* Enhanced sticky input with backdrop */
+.fixed.bottom-0 {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(31, 41, 55, 0.95) !important;
+  border-top: 1px solid rgba(55, 65, 81, 0.5);
+  box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.3);
+  z-index: 40 !important;
+}
+
+/* Ensure proper transition for sidebar */
+.fixed.bottom-0 {
+  transition: left 0.3s ease-in-out;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 1023px) {
+  .fixed.bottom-0 {
+    left: 0 !important;
+  }
+}
+
+/* Sticky input area */
+.sticky {
+  position: sticky;
+  z-index: 30;
+}
+
+/* Enhanced code formatting */
+pre {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace !important;
+  font-size: 14px;
+  line-height: 1.5;
+  tab-size: 2;
+  -moz-tab-size: 2;
+  -o-tab-size: 2;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  background: #0d1117 !important;
+  border-radius: 8px;
+  padding: 1.5rem !important;
+  margin: 0;
+}
+
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace !important;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #e6edf3 !important;
+}
+
+/* Syntax highlighting improvements */
+.hljs {
+  background: #0d1117 !important;
+  color: #e6edf3 !important;
+}
+
+.hljs-keyword, .hljs-selector-tag, .hljs-built_in {
+  color: #ff7b72 !important;
+}
+
+.hljs-string, .hljs-attr {
+  color: #a5d6ff !important;
+}
+
+.hljs-number, .hljs-literal {
+  color: #79c0ff !important;
+}
+
+.hljs-comment {
+  color: #8b949e !important;
+  font-style: italic;
+}
+
+.hljs-tag, .hljs-name {
+  color: #7ee787 !important;
+}
+
+.hljs-attribute {
+  color: #f2cc60 !important;
+}
+
+/* Preview panel enhancements */
+.preview-panel {
+  transition: all 0.3s ease;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.preview-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.6);
+}
+
+.fullscreen-preview {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  border-radius: 0 !important;
+}
+
+/* Preview size variants */
+.mobile-preview {
+  max-width: 375px;
+  margin: 0 auto;
+  border-left: 4px solid #374151;
+  border-right: 4px solid #374151;
+}
+
+.tablet-preview {
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+.desktop-preview {
+  width: 100%;
+}
+
 /* Prevent horizontal overflow */
 .min-h-screen {
   overflow-x: hidden;
@@ -27,16 +155,54 @@ pre {
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 }
 
-/* Ensure textarea doesn't cause overflow */
+/* Enhanced input styling for fixed position */
 textarea {
   min-width: 0;
   box-sizing: border-box;
+  resize: none;
+  transition: all 0.2s ease;
+  background: rgba(55, 65, 81, 0.8) !important;
+  border: 1px solid rgba(75, 85, 99, 0.6) !important;
+  backdrop-filter: blur(10px);
 }
 
-/* Button responsive sizing */
+textarea:focus {
+  background: rgba(55, 65, 81, 0.95) !important;
+  border-color: rgba(59, 130, 246, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Send button enhancements */
 button {
   min-width: 0;
   flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+/* Chat messages bottom padding for fixed input */
+.pb-32 {
+  padding-bottom: 8rem !important;
+}
+
+/* Smooth scrolling for chat container */
+.overflow-y-auto {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced chat input container */
+.fixed.bottom-0 .relative {
+  max-width: none;
+}
+
+/* Responsive input spacing */
+@media (max-width: 640px) {
+  .pb-32 {
+    padding-bottom: 7rem !important;
+  }
+  
+  .fixed.bottom-0 {
+    padding: 1rem !important;
+  }
 }
 
 /* Comprehensive overflow management */

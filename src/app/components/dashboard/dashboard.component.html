@@ -108,10 +108,10 @@
       </div>
     </nav>
 
-    <!-- Chat Container -->
+    <!-- Chat Container with bottom padding for fixed input -->
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Messages Area -->
-      <div #chatContainer class="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-gray-900 to-gray-800">
+      <div #chatContainer class="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-gray-900 to-gray-800 pb-32">
         <div *ngFor="let message of chatMessages; trackBy: trackByMessageId" 
              class="flex animate-fade-in"
              [ngClass]="{
@@ -173,6 +173,12 @@
                           </svg>
                           <span>Copy</span>
                         </button>
+                        <button *ngIf="message.language === 'html' || message.code?.includes('<!DOCTYPE') || message.code?.includes('<html')"
+                                (click)="togglePreview(message.code)"
+                                class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm transition-colors flex items-center space-x-1">
+                          <i class="fas fa-eye w-4 h-4"></i>
+                          <span>Preview</span>
+                        </button>
                       </div>
                     </div>
                     
@@ -209,8 +215,10 @@
         </div>
       </div>
 
-      <!-- Input Area -->
-      <div class="border-t border-gray-700/50 bg-gray-800/95 backdrop-blur-xl p-4 lg:p-6">
+      <!-- Input Area - Fixed & Sticky -->
+      <div class="fixed bottom-0 left-0 right-0 border-t border-gray-700/50 bg-gray-800/95 backdrop-blur-xl p-4 lg:p-6 z-40"
+           [class.lg:left-80]="showSidebar"
+           [class.left-0]="!showSidebar">
         <div class="w-full max-w-none lg:max-w-4xl mx-auto">
           <div class="relative flex items-end space-x-2 lg:space-x-4">
             <!-- Text Input -->
@@ -244,9 +252,10 @@
       </div>
     </div>
   </div>
-  <!-- Preview Panel (Floating) -->
+  <!-- Enhanced Preview Panel (Floating) -->
   <div *ngIf="showPreview && iframeSrc" 
-       class="fixed bottom-4 right-4 w-80 lg:w-96 h-56 lg:h-64 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl z-50 overflow-hidden">
+       class="preview-panel fixed bottom-4 right-4 w-80 lg:w-96 h-56 lg:h-64 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl z-50 overflow-hidden"
+       [class.fullscreen-preview]="isFullscreen">
     <!-- Preview Header -->
     <div class="flex items-center justify-between p-3 bg-gray-900 border-b border-gray-700">
       <h3 class="text-sm font-medium text-white flex items-center">
@@ -258,17 +267,21 @@
                 (click)="setPreviewSize(size.toLowerCase())"
                 [class.bg-blue-500]="currentPreviewSize === size.toLowerCase()"
                 [class.text-white]="currentPreviewSize === size.toLowerCase()"
-                class="text-xs px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors">
+                [class.bg-gray-700]="currentPreviewSize !== size.toLowerCase()"
+                [class.text-gray-300]="currentPreviewSize !== size.toLowerCase()"
+                class="text-xs px-2 py-1 rounded hover:bg-gray-600 transition-colors">
           {{size}}
         </button>
         <button (click)="iframeFullscreen()" 
-                class="p-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 transition-colors">
+                class="p-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 transition-colors"
+                title="Fullscreen">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
           </svg>
         </button>
         <button (click)="showPreview = false" 
-                class="p-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 transition-colors">
+                class="p-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 transition-colors"
+                title="Close">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -278,7 +291,10 @@
     
     <!-- Preview Content -->
     <iframe [src]="iframeSrc" 
-            class="w-full h-full border-0 bg-white"
+            class="w-full h-full border-0 bg-gray-900"
+            [class.mobile-preview]="currentPreviewSize === 'mobile'"
+            [class.tablet-preview]="currentPreviewSize === 'tablet'"
+            [class.desktop-preview]="currentPreviewSize === 'desktop'"
             sandbox="allow-scripts allow-same-origin"></iframe>
   </div>
 </div>

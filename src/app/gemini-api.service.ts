@@ -51,28 +51,38 @@ export class GeminiApiService {
   }
 
   private buildEnhancedPrompt(prompt: string, language: string): string {
-    const baseInstructions = `You are a senior software engineer creating production-ready code. Generate clean, efficient, and well-structured code.`;
+    const baseInstructions = `You are an expert software engineer. Create beautiful, professional, production-ready code that follows modern best practices.`;
     
     switch (language.toLowerCase()) {
       case 'html':
       case 'htmlcss':
         return `${baseInstructions}
 
-Create a complete, modern HTML page with embedded CSS for: ${prompt}
+Create a stunning, modern HTML page with embedded CSS for: ${prompt}
 
-Requirements:
-- Use semantic HTML5 elements
-- Include comprehensive CSS styling in <style> tags
-- Implement responsive design (mobile-first)
-- Add smooth animations and hover effects
-- Use modern CSS features (flexbox, grid, custom properties)
-- Ensure accessibility (ARIA labels, proper contrast)
-- Apply dark theme with professional color scheme
-- Include proper meta tags and viewport settings
-- Use Google Fonts or web-safe fonts
-- Add subtle shadows, gradients, and modern UI elements
+IMPORTANT REQUIREMENTS:
+- Generate a COMPLETE HTML document with DOCTYPE
+- Use modern, beautiful design with gradients and animations
+- Implement a professional dark theme (#0f172a background, #1e293b cards)
+- Add responsive design that works on all devices
+- Use modern CSS Grid and Flexbox layouts
+- Include smooth hover effects and micro-interactions
+- Add subtle shadows, border-radius, and modern typography
+- Use professional color palette (blues, purples, grays)
+- Include loading animations if applicable
+- Add proper spacing and visual hierarchy
+- Use CSS custom properties for consistent theming
+- Ensure excellent user experience and accessibility
 
-Return ONLY the complete HTML with embedded CSS. No explanations or markdown.`;
+Style Guidelines:
+- Font: 'Inter', 'Segoe UI', sans-serif
+- Primary colors: #3b82f6 (blue), #8b5cf6 (purple)
+- Background: #0f172a, Cards: #1e293b
+- Text: #e2e8f0, Muted: #94a3b8
+- Borders: #334155
+- Shadows: rgba(0, 0, 0, 0.3)
+
+Return ONLY the complete HTML code. No explanations or markdown blocks.`;
       
       case 'css':
         return `${baseInstructions}
@@ -94,18 +104,21 @@ Return ONLY the CSS code. No explanations or markdown.`;
       case 'js':
         return `${baseInstructions}
 
-Generate modern JavaScript for: ${prompt}
+Generate modern, high-quality JavaScript for: ${prompt}
 
 Requirements:
-- Use ES6+ features (arrow functions, destructuring, modules)
-- Implement proper error handling
-- Add comprehensive comments
-- Follow clean code principles
-- Use modern async/await patterns
-- Include input validation
-- Optimize for performance
+- Use ES6+ syntax (arrow functions, destructuring, template literals)
+- Implement comprehensive error handling with try-catch
+- Add detailed comments explaining complex logic
+- Use modern async/await for asynchronous operations
+- Include input validation and type checking
+- Follow clean code principles (DRY, SOLID)
+- Use meaningful variable and function names
+- Optimize for performance and readability
+- Add JSDoc comments for functions
+- Include proper event handling
 
-Return ONLY the JavaScript code. No explanations or markdown.`;
+Return ONLY the JavaScript code. No explanations or markdown blocks.`;
       
       case 'typescript':
       case 'ts':
@@ -213,17 +226,22 @@ Return ONLY the ${language} code. No explanations or markdown.`;
       .replace(/```\s*$/g, '') // Remove closing code blocks
       .replace(/^\s*```[\w-]*\s*/g, '') // Remove opening blocks at start
       .replace(/\s*```\s*$/g, '') // Remove closing blocks at end
+      .replace(/^```[\w-]*\s*/gm, '') // Remove any remaining code block markers
+      .replace(/```$/gm, '') // Remove closing markers
       .trim();
 
-    // Remove common prefixes that AI might add
+    // Remove common AI response prefixes
     cleanedText = cleanedText
-      .replace(/^Here's.*?:\s*/i, '')
-      .replace(/^Here is.*?:\s*/i, '')
-      .replace(/^This is.*?:\s*/i, '')
-      .replace(/^Below is.*?:\s*/i, '')
+      .replace(/^Here's.*?[:\n]\s*/i, '')
+      .replace(/^Here is.*?[:\n]\s*/i, '')
+      .replace(/^This is.*?[:\n]\s*/i, '')
+      .replace(/^Below is.*?[:\n]\s*/i, '')
+      .replace(/^I'll create.*?[:\n]\s*/i, '')
+      .replace(/^Let me create.*?[:\n]\s*/i, '')
+      .replace(/^\*\*.*?\*\*\s*/g, '') // Remove bold markdown
       .trim();
 
-    // Language-specific cleaning
+    // Language-specific enhancements
     if (language === 'html' || language === 'htmlcss') {
       // Ensure we have a complete HTML document
       if (!cleanedText.includes('<!DOCTYPE') && !cleanedText.includes('<html')) {
@@ -235,26 +253,53 @@ Return ONLY the ${language} code. No explanations or markdown.`;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generated Page</title>
     <style>
-        body {
+        * {
             margin: 0;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0f172a;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #e2e8f0;
             line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
     </style>
 </head>
 <body>
+    <div class="container">
 ${cleanedText}
+    </div>
 </body>
 </html>`;
       }
+      
+      // Enhance existing HTML with better styling if needed
+      if (!cleanedText.includes('font-family') && cleanedText.includes('<style>')) {
+        cleanedText = cleanedText.replace(
+          /<style>/i,
+          `<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }`
+        );
+      }
     }
 
-    // Final cleanup
+    // Final cleanup and formatting
     return cleanedText
       .replace(/\n\s*\n\s*\n/g, '\n\n') // Remove excessive newlines
+      .replace(/^\s+|\s+$/g, '') // Trim whitespace
       .trim();
   }
 

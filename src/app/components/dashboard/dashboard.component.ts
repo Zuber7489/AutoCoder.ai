@@ -199,6 +199,9 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     this.currentMessage = '';
     this.isLoading = true;
 
+    // Force scroll to bottom after adding user message
+    setTimeout(() => this.scrollToBottom(), 100);
+
     // Add loading message
     const loadingMessage: ChatMessage = {
       id: this.generateId(),
@@ -209,6 +212,9 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     };
     this.chatMessages.push(loadingMessage);
     this.saveChatHistory();
+
+    // Force scroll to bottom after adding loading message
+    setTimeout(() => this.scrollToBottom(), 150);
 
     try {
       const generatedCode = await this.geminiApi.generateCode(messageToProcess, this.selectedLanguage);
@@ -234,8 +240,12 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       this.highlightCode();
       this.addToHistory();
       
-      // Create preview if HTML
-      if (this.selectedLanguage === 'html' || messageToProcess.toLowerCase().includes('html')) {
+      // Create preview if HTML or contains HTML
+      if (this.selectedLanguage === 'html' || 
+          messageToProcess.toLowerCase().includes('html') ||
+          messageToProcess.toLowerCase().includes('website') ||
+          messageToProcess.toLowerCase().includes('page') ||
+          messageToProcess.toLowerCase().includes('landing')) {
         this.createPreview(generatedCode);
       }
       
@@ -304,7 +314,11 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   private scrollToBottom() {
     if (this.chatContainer?.nativeElement) {
       const container = this.chatContainer.nativeElement;
-      container.scrollTop = container.scrollHeight;
+      // Smooth scroll to bottom with offset for fixed input
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }
 
@@ -321,22 +335,54 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   }
 
   private createPreview(code: string) {
-    // Clean up any previous blob URL
-    if (this.iframeSrc) {
-      const url = this.iframeSrc.toString();
-      if (url.startsWith('blob:')) {
-        URL.revokeObjectURL(url);
+    try {
+      // Clean up any previous blob URL
+      if (this.iframeSrc) {
+        const url = this.iframeSrc.toString();
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
       }
+
+      // Ensure we have valid HTML content
+      let htmlContent = code;
+      if (!htmlContent.includes('<!DOCTYPE') && !htmlContent.includes('<html')) {
+        htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+${htmlContent}
+</body>
+</html>`;
+      }
+
+      // Create new blob URL for the iframe
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      this.iframeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      this.showPreview = true;
+
+      // Clean up blob URL after 30 seconds
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+      
+      console.log('Preview created successfully');
+    } catch (error) {
+      console.error('Error creating preview:', error);
+      this.showPreview = false;
     }
-
-    // Create new blob URL for the iframe
-    const blob = new Blob([code], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    this.iframeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    this.showPreview = true;
-
-    // Clean up blob URL after 10 seconds
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
 
   private highlightCode() {
@@ -389,29 +435,18 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
 
   setPreviewSize(size: string) {
     this.currentPreviewSize = size;
-    const previewElement = document.querySelector('iframe');
-    if (previewElement) {
-      switch (size) {
-        case 'mobile':
-          previewElement.style.maxWidth = '375px';
-          break;
-        case 'tablet':
-          previewElement.style.maxWidth = '768px';
-          break;
-        case 'desktop':
-          previewElement.style.maxWidth = '100%';
-          break;
-      }
-      previewElement.style.margin = 'auto';
-    }
+    // Preview size is now handled by CSS classes
   }
 
   iframeFullscreen() {
-    const iframe = document.querySelector('#preview-container');
-    if (iframe) {
-      const previewContainer = iframe;
-      if (previewContainer && previewContainer.requestFullscreen) {
-        previewContainer.requestFullscreen();
+    const previewPanel = document.querySelector('.preview-panel');
+    if (previewPanel) {
+      if (previewPanel.requestFullscreen) {
+        previewPanel.requestFullscreen();
+      } else if ((previewPanel as any).webkitRequestFullscreen) {
+        (previewPanel as any).webkitRequestFullscreen();
+      } else if ((previewPanel as any).msRequestFullscreen) {
+        (previewPanel as any).msRequestFullscreen();
       }
     }
   }
@@ -443,5 +478,20 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   logout() {
     localStorage.setItem('isAuthenticated', 'false');
     this.router.navigate(['/']);
+  }
+
+  // Method to manually toggle preview
+  togglePreview(code?: string) {
+    if (this.showPreview) {
+      this.showPreview = false;
+      if (this.iframeSrc) {
+        const url = this.iframeSrc.toString();
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      }
+    } else if (code) {
+      this.createPreview(code);
+    }
   }
 }
