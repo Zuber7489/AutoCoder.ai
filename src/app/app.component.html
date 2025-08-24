@@ -1,1 +1,7 @@
+<!-- Navbar - Show on all pages except dashboard -->
+<app-navbar *ngIf="!isDashboard"></app-navbar>
+
+<!-- Main Content -->
+<div [class.pt-16]="!isDashboard">
   <router-outlet></router-outlet>
+</div>

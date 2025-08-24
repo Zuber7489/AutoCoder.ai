@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, NavigationEnd } from '@angular/router';
 import { GeminiApiService } from './gemini-api.service';
 import hljs from 'highlight.js';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { filter } from 'rxjs/operators';
 
 interface HistoryItem {
   timestamp: Date;
@@ -33,6 +35,7 @@ export class AppComponent implements OnInit {
   currentPreviewSize: string = 'desktop';
   isAuthenticated: boolean = false; // Add authentication state
   showAuthModal: boolean = false; // Control auth modal visibility
+  isDashboard: boolean = false; // Track if current route is dashboard
   quickExamples = [
     { title: 'Todo App', prompt: 'Create a modern todo application with add, edit, delete, and mark complete functionality. Include drag and drop reordering, local storage persistence, and a clean responsive design with dark mode support.', language: 'html' },
     { title: 'Weather Widget', prompt: 'Build a beautiful weather widget component that displays current weather, 5-day forecast, and has smooth animations. Include location detection and multiple city support.', language: 'javascript' },
@@ -44,7 +47,8 @@ export class AppComponent implements OnInit {
   constructor(
     private geminiApi: GeminiApiService,
     private sanitizer: DomSanitizer,
-    private clipboard: Clipboard
+    private clipboard: Clipboard,
+    private router: Router
   ) {
     // Load dark mode preference (default to true for dark mode)
     this.isDarkMode = localStorage.getItem('darkMode') !== 'false';
@@ -55,6 +59,14 @@ export class AppComponent implements OnInit {
     if (savedHistory) {
       this.history = JSON.parse(savedHistory);
     }
+
+    // Subscribe to router events to detect dashboard route
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event) => {
+      const navigationEvent = event as NavigationEnd;
+      this.isDashboard = navigationEvent.url.includes('/dashboard');
+    });
   }
 
   ngOnInit() {
