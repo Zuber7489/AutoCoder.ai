@@ -279,7 +279,10 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     setTimeout(() => this.scrollToBottom(), 150);
 
     try {
-      const generatedCode = await this.geminiApi.generateCode(messageToProcess, this.selectedLanguage);
+      const rawResponse = await this.geminiApi.generateCode(messageToProcess, this.selectedLanguage);
+      
+      // Process and clean the response
+      let processedCode = this.processGeminiResponse(rawResponse);
       
       // Remove loading message
       this.chatMessages = this.chatMessages.filter(msg => !msg.isLoading);
@@ -290,7 +293,7 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
         type: 'assistant',
         role: 'assistant',
         content: `I've generated a ${this.selectedLanguage} solution for you:`,
-        code: generatedCode,
+        code: processedCode,
         language: this.selectedLanguage,
         timestamp: new Date()
       };
@@ -298,11 +301,12 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       this.chatMessages.push(responseMessage);
       this.conversation = [...this.chatMessages]; // Sync with template
       
-      console.log('Generated code:', generatedCode); // Debug log
+      console.log('Raw response:', rawResponse); // Debug log
+      console.log('Processed code:', processedCode); // Debug log
       console.log('Response message:', responseMessage); // Debug log
       
       // Update legacy properties for compatibility
-      this.generatedContent = generatedCode;
+      this.generatedContent = processedCode;
       this.prompt = messageToProcess;
       this.highlightCode();
       this.addToHistory();
@@ -313,11 +317,11 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
           messageToProcess.toLowerCase().includes('website') ||
           messageToProcess.toLowerCase().includes('page') ||
           messageToProcess.toLowerCase().includes('landing')) {
-        this.createPreview(generatedCode);
+        this.createPreview(processedCode);
       }
       
       // Get suggestions asynchronously
-      this.getSuggestionsForMessage(responseMessage.id, generatedCode);
+      this.getSuggestionsForMessage(responseMessage.id, processedCode);
       
     } catch (error) {
       // Remove loading message
@@ -495,6 +499,68 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
 
   private generateId(): string {
     return Math.random().toString(36).substr(2, 9);
+  }
+
+  // Process Gemini API response to extract clean code
+  private processGeminiResponse(rawResponse: string): string {
+    try {
+      let cleanCode = rawResponse;
+      
+      // Remove markdown code blocks (```html, ```javascript, etc.)
+      cleanCode = cleanCode.replace(/```[a-zA-Z]*\n?/g, '');
+      cleanCode = cleanCode.replace(/```/g, '');
+      
+      // Decode HTML entities
+      const entityMap: { [key: string]: string } = {
+        '\u003c': '<',
+        '\u003e': '>',
+        '\u0026': '&',
+        '\u0022': '"',
+        '\u0027': "'",
+        '\u003d': '=',
+        '\u002f': '/',
+        '\u005c': '\\',
+        '\n': '\n',
+        '\t': '\t',
+        '\r': '\r'
+      };
+      
+      // Replace all HTML entities
+      Object.keys(entityMap).forEach(entity => {
+        const regex = new RegExp(entity, 'g');
+        cleanCode = cleanCode.replace(regex, entityMap[entity]);
+      });
+      
+      // Additional cleanup for common issues
+      cleanCode = cleanCode.trim();
+      
+      // If it's still not valid HTML, try to parse as JSON and extract
+      if (cleanCode.includes('"text"') && cleanCode.includes('\\u')) {
+        try {
+          const parsed = JSON.parse(cleanCode);
+          if (parsed.text) {
+            cleanCode = parsed.text;
+            // Remove markdown again after JSON parsing
+            cleanCode = cleanCode.replace(/```[a-zA-Z]*\n?/g, '');
+            cleanCode = cleanCode.replace(/```/g, '');
+            
+            // Decode unicode escapes
+            cleanCode = cleanCode.replace(/\\u([0-9a-fA-F]{4})/g, (match, code) => {
+              return String.fromCharCode(parseInt(code, 16));
+            });
+          }
+        } catch (jsonError) {
+          console.log('Not JSON format, using as-is');
+        }
+      }
+      
+      console.log('Cleaned code:', cleanCode.substring(0, 200) + '...');
+      return cleanCode;
+      
+    } catch (error) {
+      console.error('Error processing Gemini response:', error);
+      return rawResponse; // Return original if processing fails
+    }
   }
 
   private scrollToBottom() {
@@ -806,6 +872,21 @@ ${htmlContent}
   getLanguageIcon(languageValue: string): string {
     const language = this.languages.find(lang => lang.value === languageValue);
     return language ? language.icon : 'fas fa-code';
+  }
+  
+  // Get highlighted code for display
+  getHighlightedCode(code: string, language?: string): string {
+    if (!code) return '';
+    
+    try {
+      const lang = language || this.selectedLanguage;
+      const highlighted = hljs.highlight(code, { language: lang }).value;
+      return highlighted;
+    } catch (error) {
+      console.log('Highlighting failed, using plain text:', error);
+      // Return HTML-escaped code if highlighting fails
+      return code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
   }
 
   trackByMessageId(index: number, message: ChatMessage): string {
