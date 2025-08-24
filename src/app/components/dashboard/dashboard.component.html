@@ -129,7 +129,7 @@
             <button
               class="save-key-btn"
               (click)="saveApiKey()"
-              [disabled]="!customApiKey?.trim()"
+              [disabled]="!customApiKey.trim()"
               title="Save API Key">
               <i class="fas fa-save"></i> Save Key
             </button>
@@ -286,8 +286,8 @@
             <button *ngIf="message.code" 
                     class="action-btn-sm" 
                     (click)="showPreviewMethod(message.code)" 
-                    title="Live Preview">
-              <i class="fas fa-eye"></i>
+                    title="Open Live Preview in New Tab">
+              <i class="fas fa-external-link-alt"></i>
             </button>
             <button class="action-btn-sm" (click)="regenerateResponse(message)" title="Regenerate">
               <i class="fas fa-redo"></i>
@@ -350,27 +350,6 @@
             Press Enter to send, Shift + Enter for new line
           </span>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Live Preview Modal -->
-  <div *ngIf="showPreviewModal" class="preview-modal" (click)="closePreview()">
-    <div class="preview-content" (click)="$event.stopPropagation()">
-      <div class="preview-header">
-        <h3><i class="fas fa-eye"></i> Live Preview</h3>
-        <button class="close-btn" (click)="closePreview()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="preview-body">
-        <iframe 
-          #previewFrame 
-          class="preview-frame"
-          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
-          loading="eager"
-          [srcdoc]="previewContent">
-        </iframe>
       </div>
     </div>
   </div>

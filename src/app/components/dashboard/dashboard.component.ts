@@ -78,7 +78,6 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   highlightedCode: SafeHtml = '';
   history: HistoryItem[] = [];
   iframeSrc: SafeResourceUrl | null = null;
-  showPreview: boolean = false;
   currentPreviewSize: string = 'desktop';
   
   // New UI state
@@ -314,13 +313,16 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       this.highlightCode();
       this.addToHistory();
       
-      // Create preview if HTML or contains HTML
+      // Create preview if HTML or contains HTML - Auto-open in new tab
       if (this.selectedLanguage === 'html' || 
           messageToProcess.toLowerCase().includes('html') ||
           messageToProcess.toLowerCase().includes('website') ||
           messageToProcess.toLowerCase().includes('page') ||
           messageToProcess.toLowerCase().includes('landing')) {
-        this.createPreview(processedCode);
+        // Auto-open preview in new tab for HTML content
+        setTimeout(() => {
+          this.openPreviewInNewTab(processedCode);
+        }, 500);
       }
       
       // Get suggestions asynchronously
@@ -421,140 +423,9 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     URL.revokeObjectURL(url);
   }
   
-  // Template trackBy method
-  trackByMessage(index: number, message: ChatMessage): string {
-    return message.id;
-  }
+
   
-  // Check if message contains code
-  containsCode(content: string): boolean {
-    return content.includes('<') && content.includes('>') || 
-           content.includes('function') || 
-           content.includes('class') ||
-           content.includes('const') ||
-           content.includes('let') ||
-           content.includes('var') ||
-           content.includes('{') && content.includes('}');
-  }
-  
-  // Show preview method - template expects this to be a method, not a property
-  showPreviewMethod(content: string) {
-    if (content && (content.includes('<') || content.includes('html') || content.includes('css'))) {
-      try {
-        // Ensure we have complete HTML structure with proper CSS loading
-        let fullHtml = content;
-        
-        // If it's not a complete HTML document, wrap it properly
-        if (!content.includes('<!DOCTYPE') && !content.includes('<html')) {
-          // Extract any CSS from the content
-          const cssMatch = content.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
-          const cssContent = cssMatch ? cssMatch.join('\n') : '';
-          
-          // Remove style tags from body content
-          const bodyContent = content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-          
-          fullHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Preview</title>
-    <style>
-        /* Base styles for better rendering */
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; line-height: 1.6; }
-        ${cssContent.replace(/<\/?style[^>]*>/gi, '')}
-    </style>
-</head>
-<body>
-${bodyContent}
-</body>
-</html>`;
-        } else {
-          // If it's already complete HTML, ensure CSS is properly embedded
-          fullHtml = content;
-          if (!content.includes('<style>') && !content.includes('style=')) {
-            // Add basic styling if no CSS is present
-            fullHtml = content.replace(
-              '</head>',
-              `    <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; line-height: 1.6; }
-    </style>
-</head>`
-            );
-          }
-        }
-        
-        // Store the content for direct iframe access
-        this.previewContent = fullHtml;
-        this.showPreviewModal = true;
-        
-        console.log('Opening preview with content:', fullHtml.substring(0, 500) + '...');
-        
-        // Use setTimeout to ensure modal is rendered before setting iframe content
-        setTimeout(() => {
-          if (this.previewFrame?.nativeElement) {
-            const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
-            
-            // Use srcdoc for better compatibility
-            iframe.srcdoc = fullHtml;
-            
-            // Fallback: try document.write if srcdoc doesn't work
-            iframe.onload = () => {
-              try {
-                if (!iframe.contentDocument?.body?.innerHTML) {
-                  const doc = iframe.contentDocument || iframe.contentWindow?.document;
-                  if (doc) {
-                    doc.open();
-                    doc.write(fullHtml);
-                    doc.close();
-                  }
-                }
-                console.log('Preview loaded successfully');
-              } catch (error) {
-                console.error('Error loading preview content:', error);
-              }
-            };
-            
-            // Additional fallback with document.write
-            setTimeout(() => {
-              try {
-                const doc = iframe.contentDocument || iframe.contentWindow?.document;
-                if (doc && (!doc.body || !doc.body.innerHTML.trim())) {
-                  doc.open();
-                  doc.write(fullHtml);
-                  doc.close();
-                  console.log('Used document.write fallback');
-                }
-              } catch (error) {
-                console.error('Fallback method failed:', error);
-              }
-            }, 500);
-          }
-        }, 300);
-        
-      } catch (error) {
-        console.error('Error creating preview:', error);
-        // Final fallback - just set the content
-        this.previewContent = content;
-        this.showPreviewModal = true;
-      }
-    }
-  }
-  
-  // Close preview modal
-  closePreview() {
-    this.showPreviewModal = false;
-    this.previewContent = '';
-    
-    // Clear iframe content
-    if (this.previewFrame?.nativeElement) {
-      const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
-      iframe.srcdoc = '';
-      iframe.src = 'about:blank';
-    }
-  }
+
   
   // Test preview with sample HTML/CSS
   testPreview() {
@@ -905,56 +776,8 @@ ${bodyContent}
   }
 
   private createPreview(code: string) {
-    try {
-      // Clean up any previous blob URL
-      if (this.iframeSrc) {
-        const url = this.iframeSrc.toString();
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      }
-
-      // Use the code as-is if it's already a complete HTML document
-      let htmlContent = code;
-      
-      // Only wrap if it's not already a complete HTML document
-      if (!htmlContent.includes('<!DOCTYPE') && !htmlContent.includes('<html')) {
-        htmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preview</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 1rem;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
-        }
-    </style>
-</head>
-<body>
-${htmlContent}
-</body>
-</html>`;
-      }
-
-      // Create new blob URL for the iframe
-      const blob = new Blob([htmlContent], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      this.iframeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-      this.showPreview = true;
-
-      // Clean up blob URL after 30 seconds
-      setTimeout(() => URL.revokeObjectURL(url), 30000);
-      
-      console.log('Preview created successfully with full HTML:', htmlContent.substring(0, 200) + '...');
-    } catch (error) {
-      console.error('Error creating preview:', error);
-      this.showPreview = false;
-    }
+    // Now using new tab approach instead of modal
+    this.openPreviewInNewTab(code);
   }
 
   private highlightCode() {
@@ -1081,16 +904,8 @@ ${htmlContent}
 
   // Method to manually toggle preview
   togglePreview(code?: string) {
-    if (this.showPreview) {
-      this.showPreview = false;
-      if (this.iframeSrc) {
-        const url = this.iframeSrc.toString();
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      }
-    } else if (code) {
-      this.createPreview(code);
+    if (code) {
+      this.openPreviewInNewTab(code);
     }
   }
 
@@ -1210,6 +1025,133 @@ ${htmlContent}
       this.addSystemMessage('✅ All data cleared successfully! Chat history and settings have been reset.');
       this.closeProfileModal();
     }
+  }
+
+  // Template compatibility methods
+  trackByMessage(index: number, message: ChatMessage): string {
+    return message.id;
+  }
+
+  // Show preview method for template compatibility - opens in new tab
+  showPreviewMethod(code?: string) {
+    if (code) {
+      this.openPreviewInNewTab(code);
+    }
+  }
+
+  // Additional template compatibility methods
+  closePreview() {
+    // No longer needed as we don't use modal, but keeping for compatibility
+    this.showPreviewModal = false;
+  }
+
+  // Show preview for any code (general method)
+  showPreview(code: string) {
+    this.openPreviewInNewTab(code);
+  }
+
+  // Check if content contains code
+  containsCode(content: string): boolean {
+    return content.includes('<') && content.includes('>');
+  }
+
+  // Open preview in new browser tab
+  openPreviewInNewTab(code: string) {
+    try {
+      // Create a complete HTML document
+      const fullHtmlContent = this.createFullHtmlDocument(code);
+      
+      // Create blob URL
+      const blob = new Blob([fullHtmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      
+      // Open in new tab
+      const newWindow = window.open(url, '_blank');
+      
+      if (newWindow) {
+        // Clean up blob URL after the window loads
+        newWindow.addEventListener('load', () => {
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 1000);
+        });
+      } else {
+        // Fallback if popup blocked - try direct approach
+        const newTab = window.open('', '_blank');
+        if (newTab) {
+          newTab.document.open();
+          newTab.document.write(fullHtmlContent);
+          newTab.document.close();
+          newTab.document.title = 'AutoCoder.ai - Live Preview';
+        } else {
+          alert('Please allow popups to view the live preview in a new tab.');
+        }
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Error opening preview:', error);
+      alert('Unable to open preview in new tab. Please check your browser settings.');
+    }
+  }
+
+  // Create complete HTML document for preview
+  private createFullHtmlDocument(code: string): string {
+    // Check if code already contains DOCTYPE and html tags
+    const hasDoctype = code.toLowerCase().includes('<!doctype');
+    const hasHtmlTag = code.toLowerCase().includes('<html');
+    
+    if (hasDoctype && hasHtmlTag) {
+      // Code is already a complete HTML document
+      return code;
+    }
+    
+    // Extract CSS and JS if present
+    const styleMatch = code.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
+    const scriptMatch = code.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+    
+    // Remove style and script tags from body content
+    let bodyContent = code;
+    if (styleMatch) {
+      styleMatch.forEach(style => {
+        bodyContent = bodyContent.replace(style, '');
+      });
+    }
+    if (scriptMatch) {
+      scriptMatch.forEach(script => {
+        bodyContent = bodyContent.replace(script, '');
+      });
+    }
+    
+    // Create complete HTML structure
+    const htmlDocument = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCoder.ai - Live Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #ffffff;
+            padding: 20px;
+        }
+        ${styleMatch ? styleMatch.map(style => style.replace(/<\/?style[^>]*>/gi, '')).join('\n') : ''}
+    </style>
+    ${scriptMatch ? scriptMatch.join('\n') : ''}
+</head>
+<body>
+    ${bodyContent.trim()}
+</body>
+</html>`;
+    
+    return htmlDocument;
   }
 
   navigateToSettings() {
