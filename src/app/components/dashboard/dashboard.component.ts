@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { GeminiApiService } from '../../gemini-api.service';
 import { AuthService } from '../../services/auth.service';
@@ -48,7 +48,7 @@ interface QuickExample {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit, AfterViewChecked {
+export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
   @ViewChild('previewFrame') previewFrame!: ElementRef;
@@ -161,6 +161,16 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   showProfileModal: boolean = false;
   userInfo: any = null;
 
+  // Relative time caching to prevent ExpressionChangedAfterItHasBeenCheckedError
+  private relativeTimeCache: Map<string, string> = new Map();
+  private timeUpdateInterval: any;
+  private lastUpdateTime: number = 0;
+  
+  // Scroll optimization properties
+  private scrollThrottleTimeout: any;
+  private isScrolling: boolean = false;
+  private scrollListenerAttached: boolean = false;
+
   // Language options with icons
   languages = [
     { value: 'html', label: 'HTML + CSS', icon: 'fab fa-html5' },
@@ -178,7 +188,8 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     private sanitizer: DomSanitizer,
     private clipboard: Clipboard,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {
     // Load history from localStorage
     const savedHistory = localStorage.getItem('codeHistory');
@@ -239,6 +250,30 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     // Sync template properties
     this.conversation = this.chatMessages;
     this.userInput = this.currentMessage;
+
+    // Initialize relative time cache and start update interval
+    this.initializeRelativeTimeCache();
+    this.startTimeUpdateInterval();
+  }
+
+  ngOnDestroy() {
+    // Clean up intervals and timeouts
+    if (this.timeUpdateInterval) {
+      clearInterval(this.timeUpdateInterval);
+    }
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
+    }
+    if (this.scrollThrottleTimeout) {
+      clearTimeout(this.scrollThrottleTimeout);
+    }
+    
+    // Remove scroll event listener if it exists
+    if (this.chatContainer?.nativeElement && this.scrollListenerAttached) {
+      const container = this.chatContainer.nativeElement;
+      container.removeEventListener('scroll', this.throttledScrollHandler.bind(this));
+      this.scrollListenerAttached = false;
+    }
   }
 
   private updateSidebarState() {
@@ -252,14 +287,15 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   }
 
   ngAfterViewChecked() {
-    // Only auto-scroll if not user scrolling and auto-scroll is enabled
-    if (this.autoScroll && !this.isUserScrolling) {
+    // Only auto-scroll if not user scrolling, auto-scroll is enabled, and not currently scrolling
+    if (this.autoScroll && !this.isUserScrolling && !this.isScrolling) {
       this.scrollToBottom();
     }
     
-    // Set up scroll listener if not already done
-    if (this.chatContainer?.nativeElement && !this.chatContainer.nativeElement.onscroll) {
+    // Set up scroll listener only once
+    if (this.chatContainer?.nativeElement && !this.scrollListenerAttached) {
       this.setupScrollListener();
+      this.scrollListenerAttached = true;
     }
   }
 
@@ -626,36 +662,73 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     }
   }
   
-  // Set up scroll event listener to detect user scrolling
+  // Set up scroll event listener with throttling to prevent performance issues
   private setupScrollListener() {
-    if (this.chatContainer?.nativeElement) {
+    if (this.chatContainer?.nativeElement && !this.scrollListenerAttached) {
       const container = this.chatContainer.nativeElement;
       
-      container.addEventListener('scroll', () => {
-        const { scrollTop, scrollHeight, clientHeight } = container;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50; // 50px threshold
-        
-        // If user scrolls up from bottom, disable auto-scroll and show button
-        if (!isAtBottom && this.autoScroll) {
-          this.isUserScrolling = true;
+      // Use throttled scroll handling to prevent UI freezing
+      container.addEventListener('scroll', this.throttledScrollHandler.bind(this), { passive: true });
+      this.scrollListenerAttached = true;
+    }
+  }
+  
+  // Throttled scroll handler to prevent performance issues
+  private throttledScrollHandler() {
+    // Clear existing timeout
+    if (this.scrollThrottleTimeout) {
+      clearTimeout(this.scrollThrottleTimeout);
+    }
+    
+    // Set scrolling flag
+    this.isScrolling = true;
+    
+    // Throttle scroll handling to every 100ms
+    this.scrollThrottleTimeout = setTimeout(() => {
+      this.handleScrollEvent();
+      this.isScrolling = false;
+    }, 100);
+  }
+  
+  // Actual scroll event handling logic
+  private handleScrollEvent() {
+    if (!this.chatContainer?.nativeElement) return;
+    
+    const container = this.chatContainer.nativeElement;
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50; // 50px threshold
+    
+    // Update scroll state without triggering change detection
+    const wasShowingScrollButton = this.showScrollToBottom;
+    
+    // If user scrolls up from bottom, disable auto-scroll and show button
+    if (!isAtBottom && this.autoScroll) {
+      this.isUserScrolling = true;
+      this.showScrollToBottom = true;
+      
+      // Re-enable auto-scroll after a delay if user stops scrolling
+      clearTimeout(this.scrollTimeout);
+      this.scrollTimeout = setTimeout(() => {
+        // Check if still not at bottom
+        const currentIsAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 50;
+        if (!currentIsAtBottom) {
           this.showScrollToBottom = true;
-          
-          // Re-enable auto-scroll after a delay if user stops scrolling
-          clearTimeout(this.scrollTimeout);
-          this.scrollTimeout = setTimeout(() => {
-            // Check if still not at bottom
-            const currentIsAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 50;
-            if (!currentIsAtBottom) {
-              this.showScrollToBottom = true;
-            }
-          }, 500);
-        } else if (isAtBottom) {
-          // User scrolled back to bottom, re-enable auto-scroll
-          this.isUserScrolling = false;
-          this.showScrollToBottom = false;
-          clearTimeout(this.scrollTimeout);
+          // Only trigger change detection if button visibility changed
+          if (!wasShowingScrollButton) {
+            this.cdr.markForCheck();
+          }
         }
-      });
+      }, 500);
+    } else if (isAtBottom) {
+      // User scrolled back to bottom, re-enable auto-scroll
+      this.isUserScrolling = false;
+      this.showScrollToBottom = false;
+      clearTimeout(this.scrollTimeout);
+    }
+    
+    // Only trigger change detection if scroll button visibility actually changed
+    if (wasShowingScrollButton !== this.showScrollToBottom) {
+      this.cdr.markForCheck();
     }
   }
   
@@ -749,11 +822,12 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     const existingChatIndex = this.chatHistories.findIndex(chat => chat.id === this.currentChatId);
     const title = this.generateChatTitle();
     const lastMessage = this.getLastUserMessage();
+    const timestamp = new Date();
 
     const chatHistory: ChatHistory = {
       id: this.currentChatId,
       title: title,
-      timestamp: new Date(),
+      timestamp: timestamp,
       messages: [...this.chatMessages],
       lastMessage: lastMessage,
       language: this.selectedLanguage
@@ -764,6 +838,11 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     } else {
       this.chatHistories.unshift(chatHistory);
     }
+
+    // Update relative time cache for this chat
+    const dateString = timestamp.toISOString();
+    const relativeTime = this.calculateRelativeTime(timestamp);
+    this.relativeTimeCache.set(dateString, relativeTime);
 
     // Keep only last 50 chats
     if (this.chatHistories.length > 50) {
@@ -796,13 +875,31 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     }
     
     localStorage.setItem('chatHistories', JSON.stringify(this.chatHistories));
+    
+    // Update relative time cache for all chats
+    this.initializeRelativeTimeCache();
   }
 
   toggleHistoryPanel() {
     this.showHistoryPanel = !this.showHistoryPanel;
   }
 
+  // Updated getRelativeTime method that uses caching to prevent ExpressionChangedAfterItHasBeenCheckedError
   getRelativeTime(date: Date): string {
+    const dateString = new Date(date).toISOString();
+    
+    // Return cached value if available
+    if (this.relativeTimeCache.has(dateString)) {
+      return this.relativeTimeCache.get(dateString)!;
+    }
+    
+    // Calculate and cache the relative time
+    const relativeTime = this.calculateRelativeTime(date);
+    this.relativeTimeCache.set(dateString, relativeTime);
+    return relativeTime;
+  }
+
+  private calculateRelativeTime(date: Date): string {
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - new Date(date).getTime()) / 1000);
     
@@ -819,6 +916,60 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       return `${days}d ago`;
     } else {
       return new Date(date).toLocaleDateString();
+    }
+  }
+
+  private initializeRelativeTimeCache() {
+    // Initialize cache for all existing chat histories
+    this.chatHistories.forEach(chat => {
+      const dateString = new Date(chat.timestamp).toISOString();
+      const relativeTime = this.calculateRelativeTime(chat.timestamp);
+      this.relativeTimeCache.set(dateString, relativeTime);
+    });
+  }
+
+  private startTimeUpdateInterval() {
+    // Update relative times every 60 seconds to keep them current (reduced from 30s for better performance)
+    this.timeUpdateInterval = setInterval(() => {
+      // Only update if the component is still active and has chat histories
+      if (this.chatHistories.length > 0) {
+        this.updateRelativeTimeCache();
+      }
+    }, 60000); // 60 seconds
+  }
+
+  private updateRelativeTimeCache() {
+    // Only update if there are chats to update
+    if (this.chatHistories.length === 0) {
+      return;
+    }
+
+    let hasChanges = false;
+    const currentTime = Date.now();
+    
+    // Only update if enough time has passed (prevent rapid updates)
+    if (currentTime - this.lastUpdateTime < 30000) { // 30 seconds minimum between updates
+      return;
+    }
+    
+    this.lastUpdateTime = currentTime;
+    
+    // Update cache for all chat histories
+    this.chatHistories.forEach(chat => {
+      const dateString = new Date(chat.timestamp).toISOString();
+      const newRelativeTime = this.calculateRelativeTime(chat.timestamp);
+      const oldRelativeTime = this.relativeTimeCache.get(dateString);
+      
+      if (oldRelativeTime !== newRelativeTime) {
+        this.relativeTimeCache.set(dateString, newRelativeTime);
+        hasChanges = true;
+      }
+    });
+
+    // Only trigger change detection if there were actual changes
+    if (hasChanges) {
+      // Use markForCheck instead of detectChanges for better performance
+      this.cdr.markForCheck();
     }
   }
 
