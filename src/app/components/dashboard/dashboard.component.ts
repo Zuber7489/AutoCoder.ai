@@ -146,6 +146,12 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     }
   ];
 
+  // API Key Configuration
+  customApiKey: string = '';
+  hasCustomApiKey: boolean = false;
+  showApiConfig: boolean = false;
+  showApiKey: boolean = false;
+
   // Language options with icons
   languages = [
     { value: 'html', label: 'HTML + CSS', icon: 'fab fa-html5' },
@@ -201,6 +207,9 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     this.conversation = this.chatMessages;
     this.userInput = this.currentMessage;
     this.sidebarVisible = window.innerWidth >= 768;
+
+    // Initialize API key configuration
+    this.loadApiKeyConfig();
   }
 
   ngOnInit() {
@@ -1064,5 +1073,62 @@ ${htmlContent}
     } else if (code) {
       this.createPreview(code);
     }
+  }
+
+  // API Key Configuration Methods
+  loadApiKeyConfig() {
+    const savedApiKey = localStorage.getItem('gemini_api_key');
+    if (savedApiKey) {
+      this.customApiKey = savedApiKey;
+      this.hasCustomApiKey = true;
+      // Update the service with the custom API key
+      this.geminiApi.updateApiKey(savedApiKey);
+    }
+  }
+
+  toggleApiConfig() {
+    this.showApiConfig = !this.showApiConfig;
+  }
+
+  toggleApiKeyVisibility() {
+    this.showApiKey = !this.showApiKey;
+    const input = document.querySelector('.api-key-input') as HTMLInputElement;
+    if (input) {
+      input.type = this.showApiKey ? 'text' : 'password';
+    }
+  }
+
+  onApiKeyChange() {
+    // Real-time validation or processing can be added here
+  }
+
+  saveApiKey() {
+    if (this.customApiKey?.trim()) {
+      localStorage.setItem('gemini_api_key', this.customApiKey.trim());
+      this.hasCustomApiKey = true;
+      // Update the service with the new API key
+      this.geminiApi.updateApiKey(this.customApiKey.trim());
+      
+      // Show success message
+      this.addSystemMessage('✅ API key saved successfully! You can now use your custom Gemini API key.');
+      
+      // Optionally hide the config section
+      setTimeout(() => {
+        this.showApiConfig = false;
+      }, 2000);
+    }
+  }
+
+  clearApiKey() {
+    localStorage.removeItem('gemini_api_key');
+    this.customApiKey = '';
+    this.hasCustomApiKey = false;
+    this.showApiKey = false;
+    
+    // Reset to default API key
+    this.geminiApi.resetToDefaultApiKey();
+    
+    // Show info message
+    this.addSystemMessage('🔄 Switched back to default API key.');
   }
 }

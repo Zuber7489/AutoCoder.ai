@@ -13,11 +13,40 @@ export interface CodeGenerationResponse {
 })
 export class GeminiApiService {
   private genAI: any;
+  private defaultApiKey: string;
+  private currentApiKey: string;
 
   constructor() {
-    const apiKey = environment.geminiApiKey;
-    // Initialize the GoogleGenerativeAI instance
-    this.genAI = new GoogleGenerativeAI(apiKey);
+    this.defaultApiKey = environment.geminiApiKey;
+    this.currentApiKey = this.getStoredApiKey() || this.defaultApiKey;
+    this.initializeGeminiAI();
+  }
+
+  private getStoredApiKey(): string | null {
+    return localStorage.getItem('gemini_api_key');
+  }
+
+  private initializeGeminiAI() {
+    // Initialize the GoogleGenerativeAI instance with current API key
+    this.genAI = new GoogleGenerativeAI(this.currentApiKey);
+  }
+
+  updateApiKey(newApiKey: string) {
+    this.currentApiKey = newApiKey;
+    this.initializeGeminiAI();
+  }
+
+  resetToDefaultApiKey() {
+    this.currentApiKey = this.defaultApiKey;
+    this.initializeGeminiAI();
+  }
+
+  getCurrentApiKey(): string {
+    return this.currentApiKey;
+  }
+
+  isUsingCustomApiKey(): boolean {
+    return this.currentApiKey !== this.defaultApiKey;
   }
 
   async generateCode(prompt: string, language: string = 'javascript'): Promise<string> {
@@ -34,8 +63,18 @@ export class GeminiApiService {
 
       // Clean up and enhance the response
       return this.cleanAndEnhanceCodeResponse(text, language);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in generateCode:', error);
+      
+      // Check for API key related errors
+      if (error?.message?.includes('API_KEY') || error?.message?.includes('Invalid API key') || error?.message?.includes('403') || error?.status === 403) {
+        throw new Error('❌ Invalid API key. Please check your Gemini API key in the sidebar settings.');
+      }
+      
+      if (error?.message?.includes('quota') || error?.message?.includes('QUOTA_EXCEEDED')) {
+        throw new Error('📊 API quota exceeded. Please try again later or use your own API key.');
+      }
+      
       // Fallback to regular gemini-2.0-flash if experimental fails
       try {
         const fallbackModel = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
@@ -44,8 +83,12 @@ export class GeminiApiService {
         const response = await result.response;
         const text = response.text();
         return this.cleanAndEnhanceCodeResponse(text, language);
-      } catch (fallbackError) {
-        throw new Error('Failed to generate code. Please try again.');
+      } catch (fallbackError: any) {
+        console.error('Fallback error:', fallbackError);
+        if (fallbackError?.message?.includes('API_KEY') || fallbackError?.message?.includes('Invalid API key') || fallbackError?.message?.includes('403') || fallbackError?.status === 403) {
+          throw new Error('❌ Invalid API key. Please check your Gemini API key in the sidebar settings.');
+        }
+        throw new Error('⚠️ Failed to generate code. Please try again or check your API key.');
       }
     }
   }

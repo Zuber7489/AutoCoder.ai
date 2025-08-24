@@ -94,6 +94,78 @@
     </div>
     -->
 
+    <!-- API Key Configuration -->
+    <div class="api-config">
+      <div class="api-config-header">
+        <h3><i class="fas fa-key"></i> API Configuration</h3>
+        <button class="config-toggle" (click)="toggleApiConfig()" [title]="showApiConfig ? 'Hide API Settings' : 'Show API Settings'">
+          <i [class]="showApiConfig ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+        </button>
+      </div>
+      
+      <div class="api-config-content" [class.expanded]="showApiConfig">
+        <div class="api-key-section">
+          <label class="block text-sm font-medium mb-2">
+            <i class="fas fa-robot"></i> Gemini API Key
+          </label>
+          <div class="api-key-input-group">
+            <input
+              type="password"
+              [(ngModel)]="customApiKey"
+              placeholder="Enter your Gemini API key..."
+              class="api-key-input"
+              [class.has-key]="hasCustomApiKey"
+              (input)="onApiKeyChange()"
+            />
+            <button
+              class="toggle-visibility-btn"
+              (click)="toggleApiKeyVisibility()"
+              [title]="showApiKey ? 'Hide API Key' : 'Show API Key'">
+              <i [class]="showApiKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+            </button>
+          </div>
+          
+          <div class="api-key-actions">
+            <button
+              class="save-key-btn"
+              (click)="saveApiKey()"
+              [disabled]="!customApiKey?.trim()"
+              title="Save API Key">
+              <i class="fas fa-save"></i> Save Key
+            </button>
+            <button
+              class="clear-key-btn"
+              (click)="clearApiKey()"
+              [disabled]="!hasCustomApiKey"
+              title="Clear Saved Key">
+              <i class="fas fa-trash"></i> Clear
+            </button>
+          </div>
+          
+          <div class="api-key-status">
+            <div *ngIf="hasCustomApiKey" class="status-success">
+              <i class="fas fa-check-circle"></i>
+              <span>Using your custom API key</span>
+            </div>
+            <div *ngIf="!hasCustomApiKey" class="status-default">
+              <i class="fas fa-info-circle"></i>
+              <span>Using default API key</span>
+            </div>
+          </div>
+          
+          <div class="api-key-help">
+            <p class="help-text">
+              <i class="fas fa-lightbulb"></i>
+              Get your free API key from 
+              <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener">
+                Google AI Studio
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Chat Actions -->
     <div class="chat-actions">
       <button class="action-btn" (click)="clearChat()" [disabled]="isLoading">
