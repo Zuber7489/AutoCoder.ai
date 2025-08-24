@@ -50,6 +50,7 @@ interface QuickExample {
 export class DashboardComponent implements OnInit, AfterViewChecked {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
+  @ViewChild('previewFrame') previewFrame!: ElementRef;
 
   // Chat-related properties
   chatMessages: ChatMessage[] = [];
@@ -440,9 +441,54 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   // Show preview method - template expects this to be a method, not a property
   showPreviewMethod(content: string) {
     if (content && (content.includes('<') || content.includes('html') || content.includes('css'))) {
-      this.previewContent = content;
-      this.showPreviewModal = true;
-      console.log('Opening preview with content:', content.substring(0, 100) + '...');
+      try {
+        // Ensure we have complete HTML structure
+        let fullHtml = content;
+        
+        // If it's not a complete HTML document, wrap it
+        if (!content.includes('<!DOCTYPE') && !content.includes('<html')) {
+          fullHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview</title>
+</head>
+<body>
+${content}
+</body>
+</html>`;
+        }
+        
+        // Create a blob URL for the iframe
+        const blob = new Blob([fullHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        // Store the content for srcdoc fallback
+        this.previewContent = fullHtml;
+        this.showPreviewModal = true;
+        
+        // Set iframe src after modal opens
+        setTimeout(() => {
+          if (this.previewFrame?.nativeElement) {
+            const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
+            iframe.src = url;
+            
+            // Clean up blob URL after use
+            iframe.onload = () => {
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+            };
+          }
+        }, 100);
+        
+        console.log('Opening preview with content:', fullHtml.substring(0, 300) + '...');
+        
+      } catch (error) {
+        console.error('Error creating preview:', error);
+        // Fallback to srcdoc
+        this.previewContent = content;
+        this.showPreviewModal = true;
+      }
     }
   }
   
@@ -746,8 +792,10 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
         }
       }
 
-      // Ensure we have valid HTML content
+      // Use the code as-is if it's already a complete HTML document
       let htmlContent = code;
+      
+      // Only wrap if it's not already a complete HTML document
       if (!htmlContent.includes('<!DOCTYPE') && !htmlContent.includes('<html')) {
         htmlContent = `<!DOCTYPE html>
 <html lang="en">
@@ -780,7 +828,7 @@ ${htmlContent}
       // Clean up blob URL after 30 seconds
       setTimeout(() => URL.revokeObjectURL(url), 30000);
       
-      console.log('Preview created successfully');
+      console.log('Preview created successfully with full HTML:', htmlContent.substring(0, 200) + '...');
     } catch (error) {
       console.error('Error creating preview:', error);
       this.showPreview = false;
