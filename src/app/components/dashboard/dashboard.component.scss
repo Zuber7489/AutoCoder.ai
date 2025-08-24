@@ -3,9 +3,96 @@
   backdrop-filter: blur(10px);
 }
 
+/* Prevent horizontal overflow */
+.min-h-screen {
+  overflow-x: hidden;
+}
+
+/* Ensure proper text wrapping in code blocks */
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Responsive container management */
+.max-w-4xl {
+  @media (max-width: 1024px) {
+    max-width: 100%;
+  }
+}
+
 /* Code area styling */
 .code-area {
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* Ensure textarea doesn't cause overflow */
+textarea {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Button responsive sizing */
+button {
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+/* Comprehensive overflow management */
+* {
+  box-sizing: border-box;
+}
+
+.overflow-hidden {
+  overflow: hidden !important;
+}
+
+.min-w-0 {
+  min-width: 0 !important;
+}
+
+/* Flex container improvements */
+.flex-1 {
+  min-width: 0;
+}
+
+/* Message container responsive width */
+.max-w-2xl {
+  @media (max-width: 768px) {
+    max-width: calc(100vw - 3rem);
+  }
+}
+
+/* Assistant message responsive width */
+.w-full.max-w-full {
+  @media (max-width: 1024px) {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Code block responsive handling */
+.language-\* {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Input area responsive spacing */
+.space-x-2 > * + * {
+  @media (max-width: 640px) {
+    margin-left: 0.5rem;
+  }
+}
+
+/* Preview panel responsive positioning */
+.fixed.bottom-4.right-4 {
+  @media (max-width: 640px) {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+  }
 }
 
 // Custom animations and transitions

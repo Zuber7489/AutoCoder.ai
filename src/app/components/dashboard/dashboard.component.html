@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-900 flex">
+<div class="min-h-screen bg-gray-900 flex overflow-hidden">
   <!-- Sidebar -->
   <div class="fixed inset-y-0 left-0 z-50 w-80 bg-gray-800/95 backdrop-blur-xl border-r border-gray-700/50 transform transition-transform duration-300 ease-in-out"
        [class.translate-x-0]="showSidebar"
@@ -74,13 +74,13 @@
     </div>
   </div>
   <!-- Main Content -->
-  <div class="flex-1 flex flex-col transition-all duration-300"
+  <div class="flex-1 flex flex-col min-w-0 transition-all duration-300"
        [class.lg:ml-80]="showSidebar"
        [class.ml-0]="!showSidebar">
     
     <!-- Top Navigation -->
     <nav class="bg-gray-800/95 backdrop-blur-xl border-b border-gray-700/50 sticky top-0 z-40">
-      <div class="max-w-full px-4 sm:px-6">
+      <div class="w-full px-4 sm:px-6">
         <div class="flex justify-between items-center h-16">
           <!-- Mobile Sidebar Toggle -->
           <button (click)="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-700 text-gray-300">
@@ -128,7 +128,7 @@
 
           <!-- Assistant Message -->
           <div *ngIf="message.type === 'assistant'" 
-               class="max-w-4xl w-full">
+               class="w-full max-w-full lg:max-w-4xl">
             <div class="flex items-start space-x-4">
               <!-- Avatar -->
               <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -177,8 +177,8 @@
                     </div>
                     
                     <!-- Code Content -->
-                    <div class="max-h-96 overflow-y-auto">
-                      <pre class="language-{{message.language}} p-6 text-sm font-mono leading-relaxed bg-gray-900 text-gray-100"><code>{{message.code}}</code></pre>
+                    <div class="max-h-96 overflow-auto">
+                      <pre class="language-{{message.language}} p-6 text-sm font-mono leading-relaxed bg-gray-900 text-gray-100 overflow-x-auto"><code class="whitespace-pre-wrap break-words">{{message.code}}</code></pre>
                     </div>
                   </div>
 
@@ -210,16 +210,16 @@
       </div>
 
       <!-- Input Area -->
-      <div class="border-t border-gray-700/50 bg-gray-800/95 backdrop-blur-xl p-6">
-        <div class="max-w-4xl mx-auto">
-          <div class="relative flex items-end space-x-4">
+      <div class="border-t border-gray-700/50 bg-gray-800/95 backdrop-blur-xl p-4 lg:p-6">
+        <div class="w-full max-w-none lg:max-w-4xl mx-auto">
+          <div class="relative flex items-end space-x-2 lg:space-x-4">
             <!-- Text Input -->
-            <div class="flex-1 relative">
+            <div class="flex-1 min-w-0 relative">
               <textarea #messageInput
                         [(ngModel)]="currentMessage"
                         (keydown)="handleKeyPress($event)"
                         placeholder="Describe what you want to build... (Press Enter to send, Shift+Enter for new line)"
-                        class="w-full max-h-32 p-4 pr-12 bg-gray-700/50 border border-gray-600/50 rounded-2xl resize-none text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        class="w-full max-h-32 p-3 lg:p-4 pr-12 bg-gray-700/50 border border-gray-600/50 rounded-2xl resize-none text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                         rows="3"></textarea>
               
               <!-- Character Count -->
@@ -231,13 +231,13 @@
             <!-- Send Button -->
             <button (click)="sendMessage()"
                     [disabled]="isLoading || !currentMessage.trim()"
-                    class="px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-600 text-white rounded-2xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
-              <i *ngIf="!isLoading" class="fas fa-paper-plane w-5 h-5"></i>
-              <svg *ngIf="isLoading" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    class="px-4 lg:px-6 py-3 lg:py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-600 text-white rounded-2xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap">
+              <i *ngIf="!isLoading" class="fas fa-paper-plane w-4 lg:w-5 h-4 lg:h-5"></i>
+              <svg *ngIf="isLoading" class="animate-spin w-4 lg:w-5 h-4 lg:h-5" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span>{{isLoading ? 'Generating...' : 'Send'}}</span>
+              <span class="hidden sm:inline">{{isLoading ? 'Generating...' : 'Send'}}</span>
             </button>
           </div>
         </div>
@@ -246,7 +246,7 @@
   </div>
   <!-- Preview Panel (Floating) -->
   <div *ngIf="showPreview && iframeSrc" 
-       class="fixed bottom-6 right-6 w-96 h-64 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl z-50 overflow-hidden">
+       class="fixed bottom-4 right-4 w-80 lg:w-96 h-56 lg:h-64 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl z-50 overflow-hidden">
     <!-- Preview Header -->
     <div class="flex items-center justify-between p-3 bg-gray-900 border-b border-gray-700">
       <h3 class="text-sm font-medium text-white flex items-center">
