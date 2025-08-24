@@ -718,30 +718,59 @@
 // Loading Animation
 .loading-animation {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.typing-indicator {
-  display: flex;
-  gap: 4px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 0;
   
-  span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #3b82f6;
-    animation: typing 1.4s ease-in-out infinite;
+  .magic-text-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
     
-    &:nth-child(1) { animation-delay: 0s; }
-    &:nth-child(2) { animation-delay: 0.2s; }
-    &:nth-child(3) { animation-delay: 0.4s; }
+    .magic-line {
+      color: #60a5fa;
+      font-size: 0.875rem;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: magicAppear 0.8s ease-out forwards;
+      background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: magicAppear 0.8s ease-out forwards, shimmer 2s ease-in-out infinite;
+      
+      &:nth-child(1) { animation-delay: 0s; }
+      &:nth-child(2) { animation-delay: 0.3s; }
+      &:nth-child(3) { animation-delay: 0.6s; }
+      &:nth-child(4) { animation-delay: 0.9s; }
+    }
+  }
+
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+    
+    span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+      animation: typing 1.4s ease-in-out infinite;
+      
+      &:nth-child(1) { animation-delay: 0s; }
+      &:nth-child(2) { animation-delay: 0.2s; }
+      &:nth-child(3) { animation-delay: 0.4s; }
+    }
   }
 }
 
-.loading-text {
-  color: #94a3b8;
-  font-style: italic;
+.magic-pulse {
+  animation: magicPulse 2s ease-in-out infinite;
 }
 
 // Input Area
@@ -880,6 +909,41 @@
   }
 }
 
+@keyframes magicAppear {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes magicPulse {
+  0%, 100% {
+    transform: scale(1);
+    color: #3b82f6;
+  }
+  50% {
+    transform: scale(1.1);
+    color: #8b5cf6;
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  }
+}
+
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
@@ -962,6 +1026,20 @@
   border: none;
   border-radius: 0.5rem;
   background: #ffffff;
+  min-height: 400px;
+  
+  // Ensure iframe content is visible
+  &:not([srcdoc=""]) {
+    background: #ffffff;
+  }
+  
+  // Loading state
+  &[srcdoc=""] {
+    background: #f8fafc;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" font-size="18" text-anchor="middle" x="50" fill="%23666">Loading...</text></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+  }
 }
 
 // Sidebar Overlay for Mobile

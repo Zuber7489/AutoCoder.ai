@@ -263,30 +263,11 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     // Force scroll to bottom after adding user message
     setTimeout(() => this.scrollToBottom(), 100);
 
-    // Add loading message
-    const loadingMessage: ChatMessage = {
-      id: this.generateId(),
-      type: 'assistant',
-      role: 'assistant',
-      content: 'Generating your code...',
-      timestamp: new Date(),
-      isLoading: true
-    };
-    this.chatMessages.push(loadingMessage);
-    this.conversation = [...this.chatMessages]; // Sync with template
-    this.saveChatHistory();
-
-    // Force scroll to bottom after adding loading message
-    setTimeout(() => this.scrollToBottom(), 150);
-
     try {
       const rawResponse = await this.geminiApi.generateCode(messageToProcess, this.selectedLanguage);
       
       // Process and clean the response
       let processedCode = this.processGeminiResponse(rawResponse);
-      
-      // Remove loading message
-      this.chatMessages = this.chatMessages.filter(msg => !msg.isLoading);
       
       // Add response with code
       const responseMessage: ChatMessage = {
@@ -325,9 +306,6 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       this.getSuggestionsForMessage(responseMessage.id, processedCode);
       
     } catch (error) {
-      // Remove loading message
-      this.chatMessages = this.chatMessages.filter(msg => !msg.isLoading);
-      
       const errorMessage: ChatMessage = {
         id: this.generateId(),
         type: 'assistant',
@@ -442,50 +420,102 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   showPreviewMethod(content: string) {
     if (content && (content.includes('<') || content.includes('html') || content.includes('css'))) {
       try {
-        // Ensure we have complete HTML structure
+        // Ensure we have complete HTML structure with proper CSS loading
         let fullHtml = content;
         
-        // If it's not a complete HTML document, wrap it
+        // If it's not a complete HTML document, wrap it properly
         if (!content.includes('<!DOCTYPE') && !content.includes('<html')) {
+          // Extract any CSS from the content
+          const cssMatch = content.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
+          const cssContent = cssMatch ? cssMatch.join('\n') : '';
+          
+          // Remove style tags from body content
+          const bodyContent = content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+          
           fullHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preview</title>
+    <title>Live Preview</title>
+    <style>
+        /* Base styles for better rendering */
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; line-height: 1.6; }
+        ${cssContent.replace(/<\/?style[^>]*>/gi, '')}
+    </style>
 </head>
 <body>
-${content}
+${bodyContent}
 </body>
 </html>`;
+        } else {
+          // If it's already complete HTML, ensure CSS is properly embedded
+          fullHtml = content;
+          if (!content.includes('<style>') && !content.includes('style=')) {
+            // Add basic styling if no CSS is present
+            fullHtml = content.replace(
+              '</head>',
+              `    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; line-height: 1.6; }
+    </style>
+</head>`
+            );
+          }
         }
         
-        // Create a blob URL for the iframe
-        const blob = new Blob([fullHtml], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        
-        // Store the content for srcdoc fallback
+        // Store the content for direct iframe access
         this.previewContent = fullHtml;
         this.showPreviewModal = true;
         
-        // Set iframe src after modal opens
+        console.log('Opening preview with content:', fullHtml.substring(0, 500) + '...');
+        
+        // Use setTimeout to ensure modal is rendered before setting iframe content
         setTimeout(() => {
           if (this.previewFrame?.nativeElement) {
             const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
-            iframe.src = url;
             
-            // Clean up blob URL after use
+            // Use srcdoc for better compatibility
+            iframe.srcdoc = fullHtml;
+            
+            // Fallback: try document.write if srcdoc doesn't work
             iframe.onload = () => {
-              setTimeout(() => URL.revokeObjectURL(url), 1000);
+              try {
+                if (!iframe.contentDocument?.body?.innerHTML) {
+                  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+                  if (doc) {
+                    doc.open();
+                    doc.write(fullHtml);
+                    doc.close();
+                  }
+                }
+                console.log('Preview loaded successfully');
+              } catch (error) {
+                console.error('Error loading preview content:', error);
+              }
             };
+            
+            // Additional fallback with document.write
+            setTimeout(() => {
+              try {
+                const doc = iframe.contentDocument || iframe.contentWindow?.document;
+                if (doc && (!doc.body || !doc.body.innerHTML.trim())) {
+                  doc.open();
+                  doc.write(fullHtml);
+                  doc.close();
+                  console.log('Used document.write fallback');
+                }
+              } catch (error) {
+                console.error('Fallback method failed:', error);
+              }
+            }, 500);
           }
-        }, 100);
-        
-        console.log('Opening preview with content:', fullHtml.substring(0, 300) + '...');
+        }, 300);
         
       } catch (error) {
         console.error('Error creating preview:', error);
-        // Fallback to srcdoc
+        // Final fallback - just set the content
         this.previewContent = content;
         this.showPreviewModal = true;
       }
@@ -496,6 +526,77 @@ ${content}
   closePreview() {
     this.showPreviewModal = false;
     this.previewContent = '';
+    
+    // Clear iframe content
+    if (this.previewFrame?.nativeElement) {
+      const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
+      iframe.srcdoc = '';
+      iframe.src = 'about:blank';
+    }
+  }
+  
+  // Test preview with sample HTML/CSS
+  testPreview() {
+    const testContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Preview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Preview Test Success!</h1>
+        <p>If you can see this styled content, the preview functionality is working correctly.</p>
+        <button class="button" onclick="alert('JavaScript is working too!')">Test JavaScript</button>
+    </div>
+</body>
+</html>`;
+    
+    this.showPreviewMethod(testContent);
   }
   
   // Regenerate response

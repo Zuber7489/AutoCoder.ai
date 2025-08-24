@@ -200,19 +200,24 @@
       <!-- Loading Message -->
       <div *ngIf="isLoading" class="message assistant-message loading-message">
         <div class="message-avatar">
-          <i class="fas fa-robot"></i>
+          <i class="fas fa-robot magic-pulse"></i>
         </div>
         <div class="message-content">
           <div class="message-header">
             <span class="message-role">AutoCoder.ai</span>
           </div>
           <div class="loading-animation">
+            <div class="magic-text-lines">
+              <div class="magic-line">🔮 Analyzing your request...</div>
+              <div class="magic-line">✨ Conjuring the perfect code...</div>
+              <div class="magic-line">🪄 Weaving programming magic...</div>
+              <div class="magic-line">⚡ Almost ready to amaze you...</div>
+            </div>
             <div class="typing-indicator">
               <span></span>
               <span></span>
               <span></span>
             </div>
-            <span class="loading-text">Thinking...</span>
           </div>
         </div>
       </div>
@@ -260,7 +265,13 @@
         </button>
       </div>
       <div class="preview-body">
-        <iframe #previewFrame [srcdoc]="previewContent" class="preview-frame"></iframe>
+        <iframe 
+          #previewFrame 
+          class="preview-frame"
+          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+          loading="eager"
+          [srcdoc]="previewContent">
+        </iframe>
       </div>
     </div>
   </div>
