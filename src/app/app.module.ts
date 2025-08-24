@@ -5,11 +5,20 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClipboardModule } from '@angular/cdk/clipboard';
+import { HomeComponent } from './components/home/home.component';
+import { FeaturesComponent } from './components/features/features.component';
+import { PricingComponent } from './components/pricing/pricing.component';
+import { LoginComponent } from './components/login/login.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    
+    HomeComponent,
+    FeaturesComponent,
+    PricingComponent,
+    LoginComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,107 @@
+<div class="min-h-screen bg-gray-900">
+  <!-- Header Section -->
+  <div class="bg-gray-800 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-5xl font-bold text-white mb-6">
+        Simple, Transparent 
+        <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Pricing</span>
+      </h1>
+      <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+        Choose the perfect plan for your development needs. Start free and scale as you grow.
+      </p>
+    </div>
+  </div>
+
+  <!-- Pricing Cards -->
+  <div class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div 
+          *ngFor="let plan of pricingPlans" 
+          class="relative bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 hover:transform hover:-translate-y-2"
+          [class.ring-2]="plan.popular"
+          [class.ring-blue-500]="plan.popular"
+        >
+          <!-- Popular Badge -->
+          <div 
+            *ngIf="plan.popular" 
+            class="absolute -top-4 left-1/2 transform -translate-x-1/2"
+          >
+            <span class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+              Most Popular
+            </span>
+          </div>
+
+          <!-- Plan Header -->
+          <div class="text-center mb-8">
+            <h3 class="text-2xl font-bold text-white mb-2">{{plan.name}}</h3>
+            <p class="text-gray-400 mb-4">{{plan.description}}</p>
+            <div class="mb-4">
+              <span class="text-4xl font-bold text-white">{{plan.price}}</span>
+              <span class="text-gray-400 ml-2">{{plan.period}}</span>
+            </div>
+          </div>
+
+          <!-- Features List -->
+          <ul class="space-y-4 mb-8">
+            <li 
+              *ngFor="let feature of plan.features" 
+              class="flex items-center text-gray-300"
+            >
+              <svg class="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              {{feature}}
+            </li>
+          </ul>
+
+          <!-- CTA Button -->
+          <button 
+            (click)="selectPlan(plan)"
+            class="w-full py-3 px-6 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:-translate-y-1"
+            [ngClass]="{
+              'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-xl': plan.popular,
+              'border-2 border-gray-600 text-gray-300 hover:bg-gray-700': !plan.popular
+            }"
+          >
+            {{plan.buttonText}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ Section -->
+  <div class="bg-gray-800 py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold text-white mb-6">Frequently Asked Questions</h2>
+        <p class="text-xl text-gray-400">Got questions? We've got answers.</p>
+      </div>
+      
+      <div class="space-y-6">
+        <div 
+          *ngFor="let faq of faqs" 
+          class="bg-gray-700/50 rounded-xl p-6 border border-gray-600/50"
+        >
+          <h3 class="text-lg font-semibold text-white mb-3">{{faq.question}}</h3>
+          <p class="text-gray-400 leading-relaxed">{{faq.answer}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final CTA -->
+  <div class="py-20">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-bold text-white mb-6">Ready to Start Building?</h2>
+      <p class="text-xl text-gray-400 mb-8">Join thousands of developers who are already coding faster with AI</p>
+      <button 
+        (click)="navigateToLogin()"
+        class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+      >
+        🚀 Start Your Free Trial
+      </button>
+    </div>
+  </div>
+</div>

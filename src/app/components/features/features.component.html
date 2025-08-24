@@ -1,0 +1,95 @@
+<div class="min-h-screen bg-gray-900">
+  <!-- Header Section -->
+  <div class="bg-gray-800 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-5xl font-bold text-white mb-6">
+        Powerful Features for 
+        <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Modern Development</span>
+      </h1>
+      <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+        Discover the cutting-edge features that make AutoCoder.ai the most advanced AI-powered code generation platform
+      </p>
+    </div>
+  </div>
+
+  <!-- Features Grid -->
+  <div class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div 
+          *ngFor="let feature of features" 
+          class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 hover:transform hover:-translate-y-2 group"
+        >
+          <!-- Icon -->
+          <div class="text-4xl mb-6 group-hover:scale-110 transition-transform duration-300">
+            {{feature.icon}}
+          </div>
+          
+          <!-- Title -->
+          <h3 class="text-2xl font-bold text-white mb-4">{{feature.title}}</h3>
+          
+          <!-- Description -->
+          <p class="text-gray-400 mb-6 leading-relaxed">{{feature.description}}</p>
+          
+          <!-- Benefits -->
+          <ul class="space-y-2">
+            <li 
+              *ngFor="let benefit of feature.benefits" 
+              class="flex items-center text-gray-300"
+            >
+              <svg class="w-4 h-4 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              {{benefit}}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Section -->
+  <div class="bg-gray-800 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold text-white mb-6">See It In Action</h2>
+        <p class="text-xl text-gray-400">Watch how AutoCoder.ai transforms your ideas into code</p>
+      </div>
+      
+      <!-- Demo Video Placeholder -->
+      <div class="bg-gray-700/50 rounded-2xl p-8 border border-gray-600/50 max-w-4xl mx-auto">
+        <div class="aspect-video bg-gray-600 rounded-xl flex items-center justify-center">
+          <div class="text-center">
+            <svg class="w-20 h-20 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-6-7V4a1 1 0 011-1h4a1 1 0 011 1v3M7 7h10l4 4v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6l4-4z"/>
+            </svg>
+            <h3 class="text-xl font-semibold text-white mb-2">Interactive Demo</h3>
+            <p class="text-gray-400">Coming Soon - Live demo of code generation</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="py-20">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-bold text-white mb-6">Ready to Experience These Features?</h2>
+      <p class="text-xl text-gray-400 mb-8">Start building with AI-powered code generation today</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button 
+          (click)="navigateToLogin()"
+          class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+        >
+          🚀 Start Free Trial
+        </button>
+        <button 
+          (click)="navigateToPricing()"
+          class="border-2 border-gray-600 text-gray-300 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 transition-all duration-200"
+        >
+          View Pricing Plans
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

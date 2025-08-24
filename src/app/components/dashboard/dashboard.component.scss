@@ -1,0 +1,55 @@
+/* Dashboard component specific styles */
+.dashboard-header {
+  backdrop-filter: blur(10px);
+}
+
+/* Code area styling */
+.code-area {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* Preview container styling */
+#preview-container:-webkit-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 0 !important;
+  background: #000 !important;
+  
+  iframe {
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 0 !important;
+  }
+}
+
+#preview-container:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 0 !important;
+  background: #000 !important;
+  
+  iframe {
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* History item hover effects */
+.history-item {
+  transition: all 0.3s ease;
+}
+
+.history-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Tab styling */
+.tab-active {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+}

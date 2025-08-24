@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  geminiApiKey: 'AIzaSyCIBNokHApxmCCRbbVpsBxOsRt64MuW5PY',
+  geminiApiKey: 'AIzaSyBCpnIM80GJgMEpEayshSIoIeM4Pyb9chU',
   firebaseConfig : {
     apiKey: "AIzaSyBmBz7aUiW_flsQHNCdF7rkejFdzLBYL6g",
     authDomain: "luminachat-e32ac.firebaseapp.com",

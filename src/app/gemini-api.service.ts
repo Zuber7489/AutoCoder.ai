@@ -17,7 +17,7 @@ export class GeminiApiService {
   async generateCode(prompt: string, language: string = 'javascript'): Promise<string> {
     try {
       // For text-only input, use the gemini-pro model
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
       // Create a language-specific prompt
       let languagePrompt = '';

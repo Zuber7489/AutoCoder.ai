@@ -1,0 +1,33 @@
+/* Pricing component specific styles */
+.pricing-card {
+  transition: all 0.3s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Popular plan highlight */
+.popular-plan {
+  position: relative;
+}
+
+.popular-plan::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #3b82f6);
+  border-radius: 1rem;
+  z-index: -1;
+}
+
+/* FAQ animations */
+.faq-item {
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+  transform: translateX(4px);
+  border-color: #3b82f6;
+}

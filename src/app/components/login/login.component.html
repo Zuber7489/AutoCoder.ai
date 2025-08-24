@@ -1,0 +1,98 @@
+<div class="min-h-screen bg-gray-900 flex items-center justify-center">
+  <div class="max-w-md w-full mx-4">
+    <!-- Login Card -->
+    <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl border border-gray-700">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+          </svg>
+        </div>
+        <h2 class="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+        <p class="text-gray-400">Sign in to start building with AI</p>
+      </div>
+
+      <!-- Login Form -->
+      <form #loginForm="ngForm" (ngSubmit)="login(email.value, password.value)">
+        <div class="space-y-6">
+          <!-- Email Field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+            <input 
+              #email
+              type="email" 
+              required
+              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-white placeholder-gray-400"
+              placeholder="Enter your email"
+            >
+          </div>
+
+          <!-- Password Field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+            <input 
+              #password
+              type="password" 
+              required
+              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-white placeholder-gray-400"
+              placeholder="Enter your password"
+            >
+          </div>
+
+          <!-- Remember Me & Forgot Password -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input type="checkbox" id="remember" class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+              <label for="remember" class="ml-2 text-sm text-gray-300">Remember me</label>
+            </div>
+            <a href="#" class="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+              Forgot password?
+            </a>
+          </div>
+
+          <!-- Sign In Button -->
+          <button 
+            type="submit"
+            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+          >
+            Sign In
+          </button>
+        </div>
+      </form>
+
+      <!-- Demo Notice -->
+      <div class="mt-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded-xl">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div>
+            <p class="text-sm text-blue-300 font-medium">Demo Mode</p>
+            <p class="text-xs text-blue-400">Any email and password combination will work</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sign Up Link -->
+      <div class="mt-8 text-center">
+        <p class="text-gray-400">
+          Don't have an account? 
+          <a href="#" class="text-blue-400 hover:text-blue-300 font-medium transition-colors ml-1">
+            Sign up for free
+          </a>
+        </p>
+      </div>
+
+      <!-- Back to Home -->
+      <div class="mt-6 text-center">
+        <button 
+          (click)="navigateToHome()"
+          class="text-gray-400 hover:text-gray-300 transition-colors text-sm"
+        >
+          ← Back to Home
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
