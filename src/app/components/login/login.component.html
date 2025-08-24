@@ -1,47 +1,90 @@
 <div class="min-h-screen bg-gray-900 flex items-center justify-center">
   <div class="max-w-md w-full mx-4">
     <!-- Login Card -->
-    <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl border border-gray-700">
+    <div class="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-gray-700/50">
       <!-- Header -->
       <div class="text-center mb-8">
         <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
-          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
-          </svg>
+          <i class="fas fa-robot text-white text-2xl"></i>
         </div>
-        <h2 class="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-        <p class="text-gray-400">Sign in to start building with AI</p>
+        <h2 class="text-3xl font-bold text-white mb-2">
+          {{ isSignUp ? 'Create Account' : 'Welcome Back' }}
+        </h2>
+        <p class="text-gray-400">
+          {{ isSignUp ? 'Join AutoCoder.ai to start building with AI' : 'Sign in to start building with AI' }}
+        </p>
       </div>
 
-      <!-- Login Form -->
-      <form #loginForm="ngForm" (ngSubmit)="login(email.value, password.value)">
+      <!-- Error Message -->
+      <div *ngIf="error" class="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-xl">
+        <div class="flex items-center">
+          <i class="fas fa-exclamation-triangle text-red-400 mr-3"></i>
+          <p class="text-sm text-red-300">{{ error }}</p>
+        </div>
+      </div>
+
+      <!-- Google Sign In Button -->
+      <button 
+        (click)="signInWithGoogle()"
+        [disabled]="isLoading"
+        class="w-full bg-white hover:bg-gray-50 text-gray-900 py-3 px-6 rounded-xl font-semibold mb-6 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        <span *ngIf="!isLoading">Continue with Google</span>
+        <span *ngIf="isLoading" class="flex items-center gap-2">
+          <i class="fas fa-spinner fa-spin"></i>
+          Signing in...
+        </span>
+      </button>
+
+      <!-- Divider -->
+      <div class="relative mb-6">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-600"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-gray-800 text-gray-400">Or continue with email</span>
+        </div>
+      </div>
+
+      <!-- Email/Password Form -->
+      <form #loginForm="ngForm" (ngSubmit)="isSignUp ? signUp(email.value, password.value) : login(email.value, password.value)">
         <div class="space-y-6">
           <!-- Email Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <i class="fas fa-envelope mr-2"></i>Email Address
+            </label>
             <input 
               #email
               type="email" 
               required
-              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-white placeholder-gray-400"
+              class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-white placeholder-gray-400"
               placeholder="Enter your email"
             >
           </div>
 
           <!-- Password Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <i class="fas fa-lock mr-2"></i>Password
+            </label>
             <input 
               #password
               type="password" 
               required
-              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-white placeholder-gray-400"
+              class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-white placeholder-gray-400"
               placeholder="Enter your password"
             >
           </div>
 
-          <!-- Remember Me & Forgot Password -->
-          <div class="flex items-center justify-between">
+          <!-- Remember Me & Forgot Password (only for sign in) -->
+          <div *ngIf="!isSignUp" class="flex items-center justify-between">
             <div class="flex items-center">
               <input type="checkbox" id="remember" class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
               <label for="remember" class="ml-2 text-sm text-gray-300">Remember me</label>
@@ -51,36 +94,35 @@
             </a>
           </div>
 
-          <!-- Sign In Button -->
+          <!-- Submit Button -->
           <button 
             type="submit"
-            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            [disabled]="isLoading"
+            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            <span *ngIf="!isLoading">
+              <i class="fas fa-sign-in-alt mr-2" *ngIf="!isSignUp"></i>
+              <i class="fas fa-user-plus mr-2" *ngIf="isSignUp"></i>
+              {{ isSignUp ? 'Create Account' : 'Sign In' }}
+            </span>
+            <span *ngIf="isLoading" class="flex items-center justify-center gap-2">
+              <i class="fas fa-spinner fa-spin"></i>
+              {{ isSignUp ? 'Creating Account...' : 'Signing In...' }}
+            </span>
           </button>
         </div>
       </form>
 
-      <!-- Demo Notice -->
-      <div class="mt-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded-xl">
-        <div class="flex items-center">
-          <svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <div>
-            <p class="text-sm text-blue-300 font-medium">Demo Mode</p>
-            <p class="text-xs text-blue-400">Any email and password combination will work</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sign Up Link -->
+      <!-- Toggle Sign Up/Sign In -->
       <div class="mt-8 text-center">
         <p class="text-gray-400">
-          Don't have an account? 
-          <a href="#" class="text-blue-400 hover:text-blue-300 font-medium transition-colors ml-1">
-            Sign up for free
-          </a>
+          {{ isSignUp ? 'Already have an account?' : "Don't have an account?" }}
+          <button 
+            (click)="toggleMode()"
+            class="text-blue-400 hover:text-blue-300 font-medium transition-colors ml-1"
+          >
+            {{ isSignUp ? 'Sign in here' : 'Sign up for free' }}
+          </button>
         </p>
       </div>
 
@@ -88,9 +130,10 @@
       <div class="mt-6 text-center">
         <button 
           (click)="navigateToHome()"
-          class="text-gray-400 hover:text-gray-300 transition-colors text-sm"
+          class="text-gray-400 hover:text-gray-300 transition-colors text-sm flex items-center justify-center gap-2"
         >
-          ← Back to Home
+          <i class="fas fa-arrow-left"></i>
+          Back to Home
         </button>
       </div>
     </div>

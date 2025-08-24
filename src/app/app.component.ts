@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event) => {
       const navigationEvent = event as NavigationEnd;
-      this.isDashboard = navigationEvent.url.includes('/dashboard');
+      this.isDashboard = navigationEvent.url.includes('/dashboard') || navigationEvent.url.includes('/login');
     });
   }
 

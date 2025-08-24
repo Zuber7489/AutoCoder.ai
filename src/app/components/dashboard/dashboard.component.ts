@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { Router } from '@angular/router';
 import { GeminiApiService } from '../../gemini-api.service';
+import { AuthService } from '../../services/auth.service';
 import hljs from 'highlight.js';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -168,7 +169,8 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     private geminiApi: GeminiApiService,
     private sanitizer: DomSanitizer,
     private clipboard: Clipboard,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     // Load history from localStorage
     const savedHistory = localStorage.getItem('codeHistory');
@@ -1055,9 +1057,16 @@ ${htmlContent}
     return chat.id;
   }
 
-  logout() {
-    localStorage.setItem('isAuthenticated', 'false');
-    this.router.navigate(['/']);
+  async logout() {
+    try {
+      await this.authService.signOutUser();
+      this.router.navigate(['/']);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Fallback logout
+      localStorage.setItem('isAuthenticated', 'false');
+      this.router.navigate(['/']);
+    }
   }
 
   // Method to manually toggle preview
