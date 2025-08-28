@@ -1942,11 +1942,39 @@ Type /shortcuts anytime to see this again!
   // Open code in a new window for viewing/editing
   openCodeInNewWindow(code: string, language?: string): void {
     try {
-      // Create a formatted HTML page to display the code
       const lang = language || this.selectedLanguage || 'text';
-      const languageDisplayName = this.languages.find(l => l.value === lang)?.label || lang;
+      
+      // If it's HTML code, render it directly
+      if (lang === 'html' || lang === 'css' || code.includes('<html') || code.includes('<!DOCTYPE')) {
+        // Create a complete HTML document for rendering
+        const fullHtmlContent = this.createFullHtmlDocument(code);
+        
+        // Open in new window
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+          newWindow.document.open();
+          newWindow.document.write(fullHtmlContent);
+          newWindow.document.close();
+          newWindow.document.title = `AutoCoder.ai - Live Preview`;
+          this.addSystemMessage('✅ Website preview opened in new window! You can see the actual rendered HTML.');
+        } else {
+          alert('Please allow popups for this site to view the website preview.');
+        }
+      } else {
+        // For non-HTML code, show code viewer
+        this.showCodeViewer(code, lang);
+      }
+    } catch (error) {
+      console.error('Error opening code in new window:', error);
+      alert('Unable to open preview. Please check your browser settings.');
+    }
+  }
 
-      const codeViewerHtml = `
+  // Show code viewer for non-HTML languages
+  private showCodeViewer(code: string, language: string): void {
+    const languageDisplayName = this.languages.find(l => l.value === language)?.label || language;
+
+    const codeViewerHtml = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2105,7 +2133,7 @@ Type /shortcuts anytime to see this again!
     <div class="code-container">
         <div class="code-block">
             <div class="code-header">Generated Code</div>
-            <pre class="line-numbers"><code id="code-content" class="language-${lang}">${this.escapeHtml(code)}</code></pre>
+            <pre class="line-numbers"><code id="code-content" class="language-${language}">${this.escapeHtml(code)}</code></pre>
         </div>
     </div>
 
@@ -2142,7 +2170,7 @@ Type /shortcuts anytime to see this again!
         }
 
         function getFileExtension() {
-            const lang = '${lang}';
+            const lang = '${language}';
             const extensions = {
                 'html': 'html',
                 'javascript': 'js',
@@ -2183,20 +2211,16 @@ Type /shortcuts anytime to see this again!
 </body>
 </html>`;
 
-      // Open in new window
-      const newWindow = window.open('', '_blank');
-      if (newWindow) {
-        newWindow.document.open();
-        newWindow.document.write(codeViewerHtml);
-        newWindow.document.close();
-        newWindow.document.title = `AutoCoder.ai - ${languageDisplayName} Code Viewer`;
-        this.addSystemMessage('✅ Code opened in new window! Use the buttons to copy, download, or print.');
-      } else {
-        alert('Please allow popups for this site to view code in new window.');
-      }
-    } catch (error) {
-      console.error('Error opening code in new window:', error);
-      alert('Unable to open code in new window. Please check your browser settings.');
+    // Open code viewer in new window
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.open();
+      newWindow.document.write(codeViewerHtml);
+      newWindow.document.close();
+      newWindow.document.title = `AutoCoder.ai - ${languageDisplayName} Code Viewer`;
+      this.addSystemMessage('✅ Code opened in code viewer! Use the buttons to copy, download, or print.');
+    } else {
+      alert('Please allow popups for this site to view code.');
     }
   }
 
