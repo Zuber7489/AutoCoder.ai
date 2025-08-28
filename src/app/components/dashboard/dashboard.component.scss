@@ -1647,7 +1647,7 @@ display: none;
   
   &.system-message {
     justify-content: center;
-    
+    display: none;
     .message-content {
       background: rgba(59, 130, 246, 0.1);
       color: #60a5fa;
