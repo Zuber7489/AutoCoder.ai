@@ -22,7 +22,7 @@ interface ChatMessage {
   code?: string;
   language?: string;
   isLoading?: boolean;
-  suggestions?: string[];
+
   explanation?: string;
 }
 
@@ -395,41 +395,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
       // Celebrate successful code generation
       this.celebrateSuccess();
 
-      // Show smart suggestions based on the generated code
-      const suggestions = this.analyzeCode(processedCode);
-      if (suggestions.length > 0) {
-        // Add suggestions after a short delay
-        setTimeout(() => {
-          const suggestionsMessage: ChatMessage = {
-            id: this.generateId(),
-            type: 'assistant',
-            role: 'assistant',
-            content: '💡 **Smart Suggestions:**',
-            timestamp: new Date()
-          };
-          this.chatMessages.push(suggestionsMessage);
-          this.conversation = [...this.chatMessages];
 
-          // Add suggestion items
-          setTimeout(() => {
-            const suggestionItems = suggestions.map(suggestion => `• ${suggestion}`).join('\n');
-            const suggestionMessage: ChatMessage = {
-              id: this.generateId(),
-              type: 'assistant',
-              role: 'assistant',
-              content: suggestionItems,
-              timestamp: new Date()
-            };
-            this.chatMessages.push(suggestionMessage);
-            this.conversation = [...this.chatMessages];
-            this.saveChatHistory();
-            this.cdr.markForCheck();
-          }, 500);
-        }, 1000);
-      }
-
-      // Get suggestions asynchronously
-      this.getSuggestionsForMessage(responseMessage.id, processedCode);
       
     } catch (error) {
       const errorMessage: ChatMessage = {
@@ -449,18 +415,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  private async getSuggestionsForMessage(messageId: string, code: string) {
-    try {
-      const suggestions = await this.geminiApi.getCodeSuggestions(code, this.selectedLanguage);
-      const message = this.chatMessages.find(msg => msg.id === messageId);
-      if (message && suggestions.length > 0) {
-        message.suggestions = suggestions;
-        this.saveChatHistory();
-      }
-    } catch (error) {
-      console.error('Error getting suggestions:', error);
-    }
-  }
+
 
   addSystemMessage(content: string) {
     const systemMessage: ChatMessage = {

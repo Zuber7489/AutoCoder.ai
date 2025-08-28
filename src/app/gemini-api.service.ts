@@ -5,7 +5,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 export interface CodeGenerationResponse {
   code: string;
   explanation?: string;
-  suggestions?: string[];
 }
 
 export interface ChatMessage {
@@ -561,32 +560,7 @@ ${cleanedText}
       .trim();
   }
 
-  // Method to get code suggestions
-  async getCodeSuggestions(code: string, language: string): Promise<string[]> {
-    try {
-      // Add user message to conversation
-      const userPrompt = `Please provide improvement suggestions for this ${language} code:\n\n${code}`;
-      this.addMessageToConversation('user', userPrompt, language);
 
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-      const context = this.getConversationContext();
-      const prompt = context + `Analyze this ${language} code and provide 3 specific improvement suggestions:\n\n${code}\n\nProvide only the suggestions as a numbered list, no explanations.`;
-
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-
-      const suggestions = text.split('\n').filter((line: string) => line.trim().match(/^\d+\./)).slice(0, 3);
-
-      // Add assistant response to conversation
-      this.addMessageToConversation('assistant', suggestions.join('\n'), language);
-
-      return suggestions;
-    } catch (error) {
-      console.error('Error getting suggestions:', error);
-      return [];
-    }
-  }
 
   // Method to explain code
   async explainCode(code: string, language: string): Promise<string> {
