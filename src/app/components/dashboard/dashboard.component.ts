@@ -1604,28 +1604,7 @@ What amazing project would you like to build today? ✨`);
     return suggestions.slice(0, 3);
   }
 
-  // Enhanced code analysis and suggestions
-  analyzeCode(code: string): string[] {
-    const suggestions: string[] = [];
 
-    if (code.includes('<img') && !code.includes('alt=')) {
-      suggestions.push('Add alt attributes to images for accessibility');
-    }
-
-    if (code.includes('<button') && !code.includes('aria-label')) {
-      suggestions.push('Consider adding aria-labels for screen readers');
-    }
-
-    if (code.includes('position: absolute') && !code.includes('position: relative')) {
-      suggestions.push('Ensure parent containers have proper positioning context');
-    }
-
-    if (code.length > 1000 && !code.includes('minify')) {
-      suggestions.push('Consider minifying CSS/JS for better performance');
-    }
-
-    return suggestions;
-  }
 
   // Quick actions for common tasks
   insertCodeSnippet(snippet: string) {
