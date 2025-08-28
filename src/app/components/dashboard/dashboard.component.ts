@@ -1272,8 +1272,7 @@ What amazing project would you like to build today? ✨`);
       // Update the service with the new API key
       this.geminiApi.updateApiKey(this.customApiKey.trim());
       
-      // Show success message
-      this.addSystemMessage('✅ API key saved successfully! You can now use your custom Gemini API key.');
+      
       
       // Optionally hide the config section
       setTimeout(() => {
@@ -1291,8 +1290,7 @@ What amazing project would you like to build today? ✨`);
     // Reset to default API key
     this.geminiApi.resetToDefaultApiKey();
     
-    // Show info message
-    this.addSystemMessage('🔄 Switched back to default API key.');
+    
   }
 
   // User Profile Methods
@@ -1351,7 +1349,7 @@ What amazing project would you like to build today? ✨`);
       this.customApiKey = '';
       this.hasCustomApiKey = false;
       
-      this.addSystemMessage('✅ All data cleared successfully! Chat history and settings have been reset.');
+      
       this.closeProfileModal();
     }
   }
@@ -1394,8 +1392,7 @@ What amazing project would you like to build today? ✨`);
           newTab.document.close();
           newTab.document.title = 'AutoCoder.ai - Live Preview';
           
-          // Show success message
-          this.addSystemMessage('✅ Live preview opened in a new tab!');
+          
           return;
         } catch (writeError) {
           console.warn('Document.write failed, trying blob URL approach:', writeError);
@@ -1429,7 +1426,7 @@ What amazing project would you like to build today? ✨`);
           const dataWindow = window.open(dataUrl, '_blank');
           
           if (dataWindow) {
-            this.addSystemMessage('✅ Live preview opened in a new tab!');
+ 
           } else {
             throw new Error('All approaches failed');
           }
@@ -1901,8 +1898,7 @@ Type /shortcuts anytime to see this again!
       this.clipboard.copy(textToCopy);
       this.copied = true;
 
-      // Show enhanced feedback
-      this.addSystemMessage('📋 Code copied to clipboard! Ready to paste anywhere.');
+      
 
       setTimeout(() => {
         this.copied = false;
@@ -1913,13 +1909,12 @@ Type /shortcuts anytime to see this again!
 
   // Enhanced preview with better error handling
   showPreviewMethod(code?: string) {
-    if (code) {
-      this.addSystemMessage('🔍 Opening live preview in new tab...');
+         if (code) {
       this.openPreviewInNewTab(code);
     } else {
       const lastCode = this.chatMessages.slice().reverse().find(msg => msg.code)?.code;
       if (lastCode) {
-        this.addSystemMessage('🔍 Opening live preview in new tab...');
+ 
         this.openPreviewInNewTab(lastCode);
       } else {
         this.addSystemMessage('💡 Generate some HTML code first, then click preview to see it live!');
@@ -1956,7 +1951,6 @@ Type /shortcuts anytime to see this again!
           newWindow.document.write(fullHtmlContent);
           newWindow.document.close();
           newWindow.document.title = `AutoCoder.ai - Live Preview`;
-          this.addSystemMessage('✅ Website preview opened in new window! You can see the actual rendered HTML.');
         } else {
           alert('Please allow popups for this site to view the website preview.');
         }
@@ -2218,7 +2212,6 @@ Type /shortcuts anytime to see this again!
       newWindow.document.write(codeViewerHtml);
       newWindow.document.close();
       newWindow.document.title = `AutoCoder.ai - ${languageDisplayName} Code Viewer`;
-      this.addSystemMessage('✅ Code opened in code viewer! Use the buttons to copy, download, or print.');
     } else {
       alert('Please allow popups for this site to view code.');
     }
