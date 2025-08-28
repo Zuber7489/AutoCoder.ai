@@ -208,28 +208,22 @@
               <button class="copy-code-btn" (click)="copyToClipboard(message.code)" title="Copy Code">
                 <i class="fas fa-copy"></i>
               </button>
+                             <button class="open-new-window-btn" (click)="openCodeInNewWindow(message.code, message.language || selectedLanguage)" title="Open in New Window">
+                <i class="fas fa-external-link-alt"></i>
+              </button>
             </div>
-            <pre><code class="hljs" [innerHTML]="getHighlightedCode(message.code, message.language)"></code></pre>
+                         <pre><code class="hljs" [innerHTML]="getHighlightedCode(message.code, message.language || selectedLanguage)"></code></pre>
           </div>
           
-          <!-- Action Buttons for Assistant Messages -->
-          <div *ngIf="message.role === 'assistant'" class="message-actions">
-            <button class="action-btn-sm" (click)="copyToClipboard(message.code || message.content)" title="Like">
-              <i class="fas fa-thumbs-up"></i>
-            </button>
-            <button class="action-btn-sm" (click)="copyToClipboard(message.code || message.content)" title="Dislike">
-              <i class="fas fa-thumbs-down"></i>
-            </button>
-            <button class="action-btn-sm" (click)="startVoiceInput()" title="Read Aloud">
-              <i class="fas fa-volume-up"></i>
-            </button>
-            <button class="action-btn-sm" (click)="showPreviewMethod(message.code)" title="Upload">
-              <i class="fas fa-upload"></i>
-            </button>
-            <button class="action-btn-sm" (click)="regenerateResponse(message)" title="Regenerate">
-              <i class="fas fa-redo"></i>
-            </button>
-          </div>
+                     <!-- Action Buttons for Assistant Messages -->
+           <div *ngIf="message.role === 'assistant' && (message.code || message.content)" class="message-actions">
+             <button class="action-btn-sm" (click)="copyToClipboard(message.code || message.content)" title="Copy">
+               <i class="fas fa-copy"></i>
+             </button>
+             <button class="action-btn-sm" (click)="openCodeInNewWindow(message.code || '', message.language || selectedLanguage)" title="Open Preview">
+               <i class="fas fa-external-link-alt"></i>
+             </button>
+           </div>
         </div>
       </div>
 

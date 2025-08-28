@@ -2645,9 +2645,26 @@ display: none;
       cursor: pointer;
       transition: all 0.2s ease;
       font-size: 0.75rem;
-      
+
       &:hover {
         background: rgba(59, 130, 246, 0.2);
+        transform: translateY(-1px);
+      }
+    }
+
+    .open-new-window-btn {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 0.375rem;
+      padding: 0.375rem 0.5rem;
+      color: #34d399;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.75rem;
+      margin-left: 0.5rem;
+
+      &:hover {
+        background: rgba(16, 185, 129, 0.2);
         transform: translateY(-1px);
       }
     }

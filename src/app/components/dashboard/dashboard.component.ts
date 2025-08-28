@@ -1938,4 +1938,272 @@ Type /shortcuts anytime to see this again!
     // Implementation for sharing chat
     console.log('Share chat functionality');
   }
+
+  // Open code in a new window for viewing/editing
+  openCodeInNewWindow(code: string, language?: string): void {
+    try {
+      // Create a formatted HTML page to display the code
+      const lang = language || this.selectedLanguage || 'text';
+      const languageDisplayName = this.languages.find(l => l.value === lang)?.label || lang;
+
+      const codeViewerHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCoder.ai - Code Viewer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        .header {
+            background: #2d2d30;
+            padding: 15px 20px;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .header .language {
+            color: #cccccc;
+            font-size: 14px;
+            background: #3e3e42;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btn {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+        .action-btn:hover {
+            background: #1177bb;
+        }
+        .code-container {
+            padding: 20px;
+            max-width: 100%;
+        }
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .code-header {
+            background: #2d2d30;
+            padding: 12px 16px;
+            border-bottom: 1px solid #3e3e42;
+            font-size: 14px;
+            color: #cccccc;
+        }
+        pre {
+            margin: 0;
+            padding: 16px;
+            background: #1e1e1e !important;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        code {
+            font-family: inherit;
+            background: transparent !important;
+            color: inherit;
+        }
+        .line-numbers {
+            counter-reset: linenumber;
+        }
+        .line-numbers .line-numbers-rows {
+            position: absolute;
+            pointer-events: none;
+            top: 0;
+            font-size: 100%;
+            left: -3.8em;
+            width: 3em;
+            letter-spacing: -1px;
+            border-right: 1px solid #3e3e42;
+            user-select: none;
+        }
+        .line-numbers-rows > span {
+            pointer-events: none;
+            display: block;
+            counter-increment: linenumber;
+        }
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #858585;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+        .token.comment {
+            color: #6a9955;
+        }
+        .token.string {
+            color: #ce9178;
+        }
+        .token.number {
+            color: #b5cea8;
+        }
+        .token.keyword {
+            color: #569cd6;
+        }
+        .token.function {
+            color: #dcdcaa;
+        }
+        .footer {
+            background: #2d2d30;
+            padding: 10px 20px;
+            border-top: 1px solid #3e3e42;
+            text-align: center;
+            color: #cccccc;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>AutoCoder.ai Code Viewer</h1>
+            <span class="language">${languageDisplayName}</span>
+        </div>
+        <div class="actions">
+            <button class="action-btn" onclick="copyCode()">📋 Copy Code</button>
+            <button class="action-btn" onclick="downloadCode()">💾 Download</button>
+            <button class="action-btn" onclick="printCode()">🖨️ Print</button>
+        </div>
+    </div>
+
+    <div class="code-container">
+        <div class="code-block">
+            <div class="code-header">Generated Code</div>
+            <pre class="line-numbers"><code id="code-content" class="language-${lang}">${this.escapeHtml(code)}</code></pre>
+        </div>
+    </div>
+
+    <div class="footer">
+        Generated by AutoCoder.ai • ${new Date().toLocaleString()}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script>
+        const code = \`${code.replace(/`/g, '\\`')}\`;
+
+        function copyCode() {
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification('Code copied to clipboard!');
+            });
+        }
+
+        function downloadCode() {
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = \`autocoder-\${Date.now()}.\${getFileExtension()}\`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('Code downloaded!');
+        }
+
+        function printCode() {
+            window.print();
+        }
+
+        function getFileExtension() {
+            const lang = '${lang}';
+            const extensions = {
+                'html': 'html',
+                'javascript': 'js',
+                'typescript': 'ts',
+                'python': 'py',
+                'css': 'css',
+                'react': 'jsx',
+                'vue': 'vue',
+                'angular': 'ts'
+            };
+            return extensions[lang] || 'txt';
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = \`
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4caf50;
+                color: white;
+                padding: 12px 16px;
+                border-radius: 4px;
+                z-index: 1000;
+                font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            \`;
+            document.body.appendChild(notification);
+            setTimeout(() => document.body.removeChild(notification), 3000);
+        }
+
+        // Initialize Prism.js
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+</body>
+</html>`;
+
+      // Open in new window
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.open();
+        newWindow.document.write(codeViewerHtml);
+        newWindow.document.close();
+        newWindow.document.title = `AutoCoder.ai - ${languageDisplayName} Code Viewer`;
+        this.addSystemMessage('✅ Code opened in new window! Use the buttons to copy, download, or print.');
+      } else {
+        alert('Please allow popups for this site to view code in new window.');
+      }
+    } catch (error) {
+      console.error('Error opening code in new window:', error);
+      alert('Unable to open code in new window. Please check your browser settings.');
+    }
+  }
+
+  // Helper method to escape HTML for safe display
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
 }
