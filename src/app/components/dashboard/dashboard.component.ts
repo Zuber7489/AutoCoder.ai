@@ -817,7 +817,7 @@ I'm your AI-powered coding assistant with super cool features!
 🚀 **New Features:**
 • 🎤 Voice input support
 • 🎊 Confetti celebrations for successful code generation
-• 💡 Smart suggestions and code analysis
+
 • ⌨️ Keyboard shortcuts (Ctrl+K, Ctrl+/, Ctrl+S, etc.)
 • 🏷️ Category-based example filtering
 • 🎨 Enhanced animations and visual effects
