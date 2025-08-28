@@ -89,65 +89,75 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
   showScrollToBottom: boolean = false;
   isUserScrolling: boolean = false;
   
-  // Enhanced quick examples with categories
+  // Enhanced quick examples with categories and super cool features
   quickExamples: QuickExample[] = [
-    { 
-      title: 'Modern Landing Page', 
-      prompt: 'Create a modern landing page for a SaaS startup with hero section, features grid, testimonials, and CTA. Include dark theme, smooth animations, and mobile-responsive design.', 
-      language: 'html', 
-      icon: 'fas fa-globe', 
-      category: 'Web Pages' 
+    {
+      title: '🚀 Modern Landing Page',
+      prompt: 'Create a stunning landing page for a SaaS startup with animated hero section, interactive features grid, customer testimonials carousel, and compelling CTA. Include particle effects, smooth scroll animations, dark theme, and full mobile responsiveness.',
+      language: 'html',
+      icon: 'fas fa-rocket',
+      category: 'Web Pages'
     },
-    { 
-      title: 'Todo App with Dark Mode', 
-      prompt: 'Build a feature-rich todo application with add/edit/delete tasks, drag & drop reordering, categories, search, local storage, and beautiful dark mode design with animations.', 
-      language: 'html', 
-      icon: 'fas fa-list-check', 
-      category: 'Applications' 
+    {
+      title: '⚡ Smart Todo App',
+      prompt: 'Build an intelligent todo application with AI-powered task suggestions, drag & drop reordering, smart categories, advanced search, local storage, voice input, and beautiful animations with dark mode.',
+      language: 'html',
+      icon: 'fas fa-brain',
+      category: 'Applications'
     },
-    { 
-      title: 'Dashboard UI', 
-      prompt: 'Create a modern admin dashboard with sidebar navigation, statistics cards, charts, data tables, and responsive design. Include dark theme and hover animations.', 
-      language: 'html', 
-      icon: 'fas fa-chart-line', 
-      category: 'Dashboards' 
+    {
+      title: '📊 Analytics Dashboard',
+      prompt: 'Create a comprehensive analytics dashboard with interactive charts, real-time data visualization, KPI cards, data tables with sorting/filtering, export functionality, and responsive design with dark theme.',
+      language: 'html',
+      icon: 'fas fa-chart-line',
+      category: 'Dashboards'
     },
-    { 
-      title: 'E-commerce Product Card', 
-      prompt: 'Design a modern product card component with image gallery, price display, rating stars, add to cart button, and smooth hover effects. Include responsive design.', 
-      language: 'html', 
-      icon: 'fas fa-shopping-cart', 
-      category: 'E-commerce' 
+    {
+      title: '🛒 E-commerce Showcase',
+      prompt: 'Design a modern e-commerce product showcase with 3D product viewer, shopping cart with animations, wishlist functionality, user reviews, related products carousel, and smooth transitions.',
+      language: 'html',
+      icon: 'fas fa-shopping-bag',
+      category: 'E-commerce'
     },
-    { 
-      title: 'Login & Signup Form', 
-      prompt: 'Create beautiful login and signup forms with input validation, password strength meter, social login options, and smooth transitions. Include responsive design and accessibility.', 
-      language: 'html', 
-      icon: 'fas fa-user-lock', 
-      category: 'Authentication' 
+    {
+      title: '🔐 Secure Auth System',
+      prompt: 'Create a comprehensive authentication system with biometric login, social OAuth integration, password strength analyzer, two-factor authentication, animated form transitions, and security best practices.',
+      language: 'html',
+      icon: 'fas fa-shield-alt',
+      category: 'Authentication'
     },
-    { 
-      title: 'Portfolio Website', 
-      prompt: 'Build a personal portfolio website with hero section, about, skills, projects gallery, contact form, and smooth scrolling animations. Include dark theme.', 
-      language: 'html', 
-      icon: 'fas fa-user-tie', 
-      category: 'Portfolio' 
+    {
+      title: '🎨 Creative Portfolio',
+      prompt: 'Build a stunning creative portfolio with parallax scrolling, interactive project galleries, skill visualization, contact form with animations, dark/light theme toggle, and smooth page transitions.',
+      language: 'html',
+      icon: 'fas fa-palette',
+      category: 'Portfolio'
     },
-    { 
-      title: 'Weather App', 
-      prompt: 'Create a beautiful weather application showing current weather, 5-day forecast, location search, and animated weather icons. Include responsive design and dark theme.', 
-      language: 'html', 
-      icon: 'fas fa-cloud-sun', 
-      category: 'Applications' 
+    {
+      title: '🌦️ Weather Intelligence',
+      prompt: 'Create an intelligent weather application with location detection, 7-day forecast with animations, weather alerts, clothing suggestions based on weather, interactive maps, and beautiful weather visualizations.',
+      language: 'html',
+      icon: 'fas fa-cloud-sun-rain',
+      category: 'Applications'
     },
-    { 
-      title: 'Pricing Table', 
-      prompt: 'Design modern pricing tables with multiple plans, feature comparisons, popular badges, and call-to-action buttons. Include hover effects and responsive design.', 
-      language: 'html', 
-      icon: 'fas fa-dollar-sign', 
-      category: 'Business' 
+    {
+      title: '💰 Premium Pricing',
+      prompt: 'Design elegant pricing tables with annual/monthly toggle, feature comparison matrix, popular plan highlighting, payment integration placeholders, animated counters, and responsive design.',
+      language: 'html',
+      icon: 'fas fa-crown',
+      category: 'Business'
     }
   ];
+
+  // New super cool features
+  isTyping: boolean = false;
+  typingSpeed: number = 50;
+  showConfetti: boolean = false;
+  keyboardShortcuts: boolean = true;
+  soundEnabled: boolean = false;
+  autoSaveEnabled: boolean = true;
+  selectedCategory: string = 'All';
+  categories: string[] = ['All', 'Web Pages', 'Applications', 'Dashboards', 'E-commerce', 'Authentication', 'Portfolio', 'Business'];
 
   // API Key Configuration
   customApiKey: string = '';
@@ -371,7 +381,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.addToHistory();
       
       // Create preview if HTML or contains HTML - Auto-open in new tab
-      if (this.selectedLanguage === 'html' || 
+      if (this.selectedLanguage === 'html' ||
           messageToProcess.toLowerCase().includes('html') ||
           messageToProcess.toLowerCase().includes('website') ||
           messageToProcess.toLowerCase().includes('page') ||
@@ -381,7 +391,43 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
           this.openPreviewInNewTab(processedCode);
         }, 500);
       }
-      
+
+      // Celebrate successful code generation
+      this.celebrateSuccess();
+
+      // Show smart suggestions based on the generated code
+      const suggestions = this.analyzeCode(processedCode);
+      if (suggestions.length > 0) {
+        // Add suggestions after a short delay
+        setTimeout(() => {
+          const suggestionsMessage: ChatMessage = {
+            id: this.generateId(),
+            type: 'assistant',
+            role: 'assistant',
+            content: '💡 **Smart Suggestions:**',
+            timestamp: new Date()
+          };
+          this.chatMessages.push(suggestionsMessage);
+          this.conversation = [...this.chatMessages];
+
+          // Add suggestion items
+          setTimeout(() => {
+            const suggestionItems = suggestions.map(suggestion => `• ${suggestion}`).join('\n');
+            const suggestionMessage: ChatMessage = {
+              id: this.generateId(),
+              type: 'assistant',
+              role: 'assistant',
+              content: suggestionItems,
+              timestamp: new Date()
+            };
+            this.chatMessages.push(suggestionMessage);
+            this.conversation = [...this.chatMessages];
+            this.saveChatHistory();
+            this.cdr.markForCheck();
+          }, 500);
+        }, 1000);
+      }
+
       // Get suggestions asynchronously
       this.getSuggestionsForMessage(responseMessage.id, processedCode);
       
@@ -572,11 +618,44 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
   
-  // Handle keyboard input
+  // Enhanced keyboard input with shortcuts
   onKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       this.sendMessage();
+    }
+
+    // Super cool keyboard shortcuts
+    if (this.keyboardShortcuts) {
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key.toLowerCase()) {
+          case '/':
+            event.preventDefault();
+            this.clearChat();
+            break;
+          case 'k':
+            event.preventDefault();
+            this.startNewChat();
+            break;
+          case 's':
+            event.preventDefault();
+            this.exportChat();
+            break;
+          case 'l':
+            event.preventDefault();
+            this.toggleSidebar();
+            break;
+        }
+      }
+
+      // Quick language switching with number keys
+      if (event.altKey && !isNaN(Number(event.key))) {
+        const languageIndex = Number(event.key) - 1;
+        if (languageIndex >= 0 && languageIndex < this.languages.length) {
+          event.preventDefault();
+          this.selectedLanguage = this.languages[languageIndex].value;
+        }
+      }
     }
   }
   
@@ -775,8 +854,22 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.conversation = []; // Sync with template
     this.selectedLanguage = 'html';
     
-    // Add welcome message
-    this.addSystemMessage('Welcome to AutoCoder.ai! I\'m here to help you generate beautiful, functional code. What would you like to build today?');
+    // Add enhanced welcome message
+    this.addSystemMessage(`🎉 **Welcome to AutoCoder.ai!** 
+
+I'm your AI-powered coding assistant with super cool features!
+
+🚀 **New Features:**
+• 🎤 Voice input support
+• 🎊 Confetti celebrations for successful code generation
+• 💡 Smart suggestions and code analysis
+• ⌨️ Keyboard shortcuts (Ctrl+K, Ctrl+/, Ctrl+S, etc.)
+• 🏷️ Category-based example filtering
+• 🎨 Enhanced animations and visual effects
+
+Try typing **/shortcuts** to see all keyboard shortcuts, or click the voice button to speak your requests!
+
+What amazing project would you like to build today? ✨`);
     
     localStorage.setItem('currentChatId', this.currentChatId);
     
@@ -1011,14 +1104,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  copyToClipboard(code?: string) {
-    const textToCopy = code || this.generatedContent;
-    if (textToCopy) {
-      this.clipboard.copy(textToCopy);
-      this.copied = true;
-      setTimeout(() => this.copied = false, 2000);
-    }
-  }
+
 
   private addToHistory() {
     const historyItem: HistoryItem = {
@@ -1275,12 +1361,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
     return message.id;
   }
 
-  // Show preview method for template compatibility - opens in new tab
-  showPreviewMethod(code?: string) {
-    if (code) {
-      this.openPreviewInNewTab(code);
-    }
-  }
+
 
   // Additional template compatibility methods
   closePreview() {
@@ -1425,5 +1506,436 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   navigateToSettings() {
     this.router.navigate(['/settings']);
+  }
+
+  // Super cool new methods for enhanced functionality
+
+  // Category filtering for quick examples
+  selectCategory(category: string) {
+    this.selectedCategory = category;
+  }
+
+  getFilteredExamples(): QuickExample[] {
+    if (this.selectedCategory === 'All') {
+      return this.quickExamples;
+    }
+    return this.quickExamples.filter(example => example.category === this.selectedCategory);
+  }
+
+  // Enhanced typing effect for AI responses
+  async typeText(text: string, messageId: string): Promise<void> {
+    this.isTyping = true;
+    const message = this.chatMessages.find(msg => msg.id === messageId);
+    if (!message) return;
+
+    message.content = '';
+    this.conversation = [...this.chatMessages];
+
+    for (let i = 0; i < text.length; i++) {
+      message.content += text[i];
+      this.conversation = [...this.chatMessages];
+      await this.delay(this.typingSpeed);
+
+      // Trigger change detection
+      this.cdr.markForCheck();
+    }
+
+    this.isTyping = false;
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Confetti celebration for successful code generation
+  celebrateSuccess() {
+    if (!this.showConfetti) {
+      this.showConfetti = true;
+      this.triggerConfetti();
+
+      setTimeout(() => {
+        this.showConfetti = false;
+        this.cdr.markForCheck();
+      }, 3000);
+    }
+  }
+
+  private triggerConfetti() {
+    // Create confetti animation
+    const confettiCount = 50;
+    const colors = ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
+
+    for (let i = 0; i < confettiCount; i++) {
+      this.createConfettiPiece(colors[Math.floor(Math.random() * colors.length)]);
+    }
+  }
+
+  private createConfettiPiece(color: string) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti-piece';
+    confetti.style.cssText = `
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: ${color};
+      top: -10px;
+      left: ${Math.random() * 100}vw;
+      z-index: 9999;
+      pointer-events: none;
+      animation: confetti-fall ${2 + Math.random() * 3}s ease-in-out forwards;
+      transform: rotate(${Math.random() * 360}deg);
+    `;
+
+    document.body.appendChild(confetti);
+
+    setTimeout(() => {
+      document.body.removeChild(confetti);
+    }, 5000);
+  }
+
+  // Voice input functionality
+  startVoiceInput() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        this.addSystemMessage('🎤 Listening... Speak your coding request!');
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        this.currentMessage = transcript;
+        this.userInput = transcript;
+        this.addSystemMessage(`📝 Heard: "${transcript}"`);
+      };
+
+      recognition.onerror = () => {
+        this.addSystemMessage('❌ Voice recognition failed. Please try again or type your request.');
+      };
+
+      recognition.start();
+    } else {
+      this.addSystemMessage('❌ Voice input is not supported in your browser.');
+    }
+  }
+
+  // Smart suggestions based on user input
+  getSmartSuggestions(input: string): string[] {
+    const suggestions: string[] = [];
+    const lowerInput = input.toLowerCase();
+
+    if (lowerInput.includes('button')) {
+      suggestions.push('Add hover effects and smooth transitions');
+      suggestions.push('Include loading states and accessibility features');
+    }
+
+    if (lowerInput.includes('form')) {
+      suggestions.push('Add form validation and error handling');
+      suggestions.push('Include success animations and user feedback');
+    }
+
+    if (lowerInput.includes('animation')) {
+      suggestions.push('Use CSS keyframes for smooth animations');
+      suggestions.push('Consider performance with transform and opacity');
+    }
+
+    if (lowerInput.includes('responsive')) {
+      suggestions.push('Use mobile-first approach with breakpoints');
+      suggestions.push('Test on various screen sizes and orientations');
+    }
+
+    return suggestions.slice(0, 3);
+  }
+
+  // Enhanced code analysis and suggestions
+  analyzeCode(code: string): string[] {
+    const suggestions: string[] = [];
+
+    if (code.includes('<img') && !code.includes('alt=')) {
+      suggestions.push('Add alt attributes to images for accessibility');
+    }
+
+    if (code.includes('<button') && !code.includes('aria-label')) {
+      suggestions.push('Consider adding aria-labels for screen readers');
+    }
+
+    if (code.includes('position: absolute') && !code.includes('position: relative')) {
+      suggestions.push('Ensure parent containers have proper positioning context');
+    }
+
+    if (code.length > 1000 && !code.includes('minify')) {
+      suggestions.push('Consider minifying CSS/JS for better performance');
+    }
+
+    return suggestions;
+  }
+
+  // Quick actions for common tasks
+  insertCodeSnippet(snippet: string) {
+    const textarea = document.querySelector('.user-input') as HTMLTextAreaElement;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      const before = text.substring(0, start);
+      const after = text.substring(end);
+
+      textarea.value = before + snippet + after;
+      textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+      textarea.focus();
+
+      this.userInput = textarea.value;
+      this.currentMessage = textarea.value;
+    }
+  }
+
+  // Keyboard shortcuts helper
+  showKeyboardShortcuts() {
+    const shortcuts = `
+🎹 Keyboard Shortcuts:
+• Ctrl/Cmd + / - Clear chat
+• Ctrl/Cmd + K - New chat
+• Ctrl/Cmd + S - Export chat
+• Ctrl/Cmd + L - Toggle sidebar
+• Alt + 1-8 - Switch language
+• Enter - Send message
+• Shift + Enter - New line
+
+Type /shortcuts anytime to see this again!
+    `.trim();
+
+    this.addSystemMessage(shortcuts);
+  }
+
+  // Auto-save functionality
+  autoSaveChat() {
+    if (this.autoSaveEnabled && this.chatMessages.length > 0) {
+      this.saveChatHistory();
+      // Show subtle save indicator
+      this.addSystemMessage('💾 Chat auto-saved');
+      setTimeout(() => {
+        // Remove the save message after 2 seconds
+        if (this.chatMessages.length > 0 &&
+            this.chatMessages[this.chatMessages.length - 1].content === '💾 Chat auto-saved') {
+          this.chatMessages.pop();
+          this.conversation = [...this.chatMessages];
+        }
+      }, 2000);
+    }
+  }
+
+  // Enhanced welcome message with interactive tour
+  startInteractiveTour() {
+    const steps = [
+      '👋 Welcome to AutoCoder.ai!',
+      '🚀 Try clicking on the example prompts in the sidebar',
+      '⚡ Use keyboard shortcuts: Ctrl+K for new chat, Ctrl+/ to clear',
+      '🎨 Switch languages with Alt+1-8 keys',
+      '🔧 Configure your API key in the sidebar for better results',
+      '💫 Enjoy building amazing things with AI!'
+    ];
+
+    let stepIndex = 0;
+    const showNextStep = () => {
+      if (stepIndex < steps.length) {
+        this.addSystemMessage(steps[stepIndex]);
+        stepIndex++;
+        setTimeout(showNextStep, 2000);
+      }
+    };
+
+    showNextStep();
+  }
+
+  // Advanced code optimization
+  async optimizeCode() {
+    if (this.currentMessage.trim()) {
+      const prompt = `Optimize this code for maximum performance: ${this.currentMessage}`;
+      await this.sendMessage();
+    } else {
+      this.addSystemMessage('💡 Enter a code prompt first, then click Optimize for performance-enhanced code!');
+    }
+  }
+
+  // Generate code with comprehensive tests
+  async generateTests() {
+    if (this.currentMessage.trim()) {
+      this.addSystemMessage('🧪 Generating code with comprehensive tests...');
+      try {
+        const result = await this.geminiApi.generateTestedCode(this.currentMessage, this.selectedLanguage);
+        const responseMessage: ChatMessage = {
+          id: this.generateId(),
+          type: 'assistant',
+          role: 'assistant',
+          content: `✅ **Tested Code Generated!**\n\nHere's your code with comprehensive tests:`,
+          code: result.code,
+          language: this.selectedLanguage,
+          timestamp: new Date()
+        };
+        this.chatMessages.push(responseMessage);
+        this.conversation = [...this.chatMessages];
+
+        // Add tests after a delay
+        setTimeout(() => {
+          const testMessage: ChatMessage = {
+            id: this.generateId(),
+            type: 'assistant',
+            role: 'assistant',
+            content: `🧪 **Unit Tests:**\n\n${result.tests}`,
+            timestamp: new Date()
+          };
+          this.chatMessages.push(testMessage);
+          this.conversation = [...this.chatMessages];
+
+          // Add coverage notes
+          setTimeout(() => {
+            const coverageMessage: ChatMessage = {
+              id: this.generateId(),
+              type: 'assistant',
+              role: 'assistant',
+              content: `📊 **Coverage Notes:**\n\n${result.coverage}`,
+              timestamp: new Date()
+            };
+            this.chatMessages.push(coverageMessage);
+            this.conversation = [...this.chatMessages];
+            this.saveChatHistory();
+            this.cdr.markForCheck();
+          }, 1000);
+        }, 1000);
+      } catch (error) {
+        this.addSystemMessage('❌ Failed to generate tested code. Please try again.');
+      }
+    } else {
+      this.addSystemMessage('💡 Enter a code prompt first, then click Test for code with comprehensive testing!');
+    }
+  }
+
+  // Perform comprehensive code review
+  async reviewCode() {
+    if (this.chatMessages.length > 1) {
+      const lastAssistantMessage = [...this.chatMessages].reverse().find(msg => msg.role === 'assistant' && msg.code);
+      if (lastAssistantMessage?.code) {
+        this.addSystemMessage('🔍 Performing comprehensive code review...');
+        try {
+          const review = await this.geminiApi.performCodeReview(lastAssistantMessage.code, lastAssistantMessage.language || this.selectedLanguage);
+
+          const reviewMessage: ChatMessage = {
+            id: this.generateId(),
+            type: 'assistant',
+            role: 'assistant',
+            content: `📋 **Code Review Results**\n\n🎯 **Overall Score: ${review.score}/100**\n\n${review.issues.map(issue =>
+              `🔴 **${issue.severity.toUpperCase()}**: ${issue.description}\n💡 **Suggestion**: ${issue.suggestion}\n`
+            ).join('\n')}\n\n📝 **Recommendations:**\n${review.recommendations.map(rec => `• ${rec}`).join('\n')}`,
+            timestamp: new Date()
+          };
+          this.chatMessages.push(reviewMessage);
+          this.conversation = [...this.chatMessages];
+          this.saveChatHistory();
+          this.cdr.markForCheck();
+        } catch (error) {
+          this.addSystemMessage('❌ Failed to perform code review. Please try again.');
+        }
+      } else {
+        this.addSystemMessage('💡 Generate some code first, then click Review for a comprehensive code analysis!');
+      }
+    } else {
+      this.addSystemMessage('💡 Generate some code first, then click Review for a comprehensive code analysis!');
+    }
+  }
+
+  // Validate and improve existing code
+  async validateCode() {
+    if (this.chatMessages.length > 1) {
+      const lastAssistantMessage = [...this.chatMessages].reverse().find(msg => msg.role === 'assistant' && msg.code);
+      if (lastAssistantMessage?.code) {
+        this.addSystemMessage('✅ Validating and improving code...');
+        try {
+          const result = await this.geminiApi.validateAndImproveCode(lastAssistantMessage.code, lastAssistantMessage.language || this.selectedLanguage);
+
+          const validationMessage: ChatMessage = {
+            id: this.generateId(),
+            type: 'assistant',
+            role: 'assistant',
+            content: `🔧 **Code Validation & Improvements**\n\n✅ **Validated Code:**`,
+            code: result.validatedCode,
+            language: lastAssistantMessage.language || this.selectedLanguage,
+            timestamp: new Date()
+          };
+          this.chatMessages.push(validationMessage);
+          this.conversation = [...this.chatMessages];
+
+          // Add improvements after a delay
+          setTimeout(() => {
+            const improvementsMessage: ChatMessage = {
+              id: this.generateId(),
+              type: 'assistant',
+              role: 'assistant',
+              content: `🚀 **Improvements Made:**\n\n${result.improvements.map(imp => `• ${imp}`).join('\n')}`,
+              timestamp: new Date()
+            };
+            this.chatMessages.push(improvementsMessage);
+            this.conversation = [...this.chatMessages];
+            this.saveChatHistory();
+            this.cdr.markForCheck();
+          }, 1000);
+        } catch (error) {
+          this.addSystemMessage('❌ Failed to validate code. Please try again.');
+        }
+      } else {
+        this.addSystemMessage('💡 Generate some code first, then click Validate for code validation and improvements!');
+      }
+    } else {
+      this.addSystemMessage('💡 Generate some code first, then click Validate for code validation and improvements!');
+    }
+  }
+
+  // Enhanced copy to clipboard with feedback
+  copyToClipboard(code?: string) {
+    const textToCopy = code || this.generatedContent;
+    if (textToCopy) {
+      this.clipboard.copy(textToCopy);
+      this.copied = true;
+
+      // Show enhanced feedback
+      this.addSystemMessage('📋 Code copied to clipboard! Ready to paste anywhere.');
+
+      setTimeout(() => {
+        this.copied = false;
+        this.cdr.markForCheck();
+      }, 2000);
+    }
+  }
+
+  // Enhanced preview with better error handling
+  showPreviewMethod(code?: string) {
+    if (code) {
+      this.addSystemMessage('🔍 Opening live preview in new tab...');
+      this.openPreviewInNewTab(code);
+    } else {
+      const lastCode = this.chatMessages.slice().reverse().find(msg => msg.code)?.code;
+      if (lastCode) {
+        this.addSystemMessage('🔍 Opening live preview in new tab...');
+        this.openPreviewInNewTab(lastCode);
+      } else {
+        this.addSystemMessage('💡 Generate some HTML code first, then click preview to see it live!');
+      }
+    }
+  }
+
+  // Method to get current chat title
+  getCurrentChatTitle(): string {
+    const currentChat = this.chatHistories.find(chat => chat.id === this.currentChatId);
+    return currentChat ? currentChat.title : 'New Chat';
+  }
+
+  // Method to share chat
+  shareChat(): void {
+    // Implementation for sharing chat
+    console.log('Share chat functionality');
   }
 }

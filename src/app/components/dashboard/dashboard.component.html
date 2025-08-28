@@ -3,168 +3,88 @@
   <div class="sidebar" [class.sidebar-hidden]="!sidebarVisible">
     <!-- Sidebar Header -->
     <div class="sidebar-header">
-      <h2><i class="fas fa-robot text-blue-500"></i> AutoCoder.ai</h2>
+      <div class="logo-section">
+        <div class="logo-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+        <h2>AutoCoder.ai</h2>
+      </div>
       <button class="sidebar-toggle md:hidden" (click)="toggleSidebar()">
         <i class="fas fa-times"></i>
       </button>
     </div>
 
-    <!-- Language Selector -->
-    <div class="language-selector">
-      <label class="block text-sm font-medium mb-2">
-        <i class="fas fa-code"></i> Programming Language
-      </label>
-      <div class="relative">
-        <select [(ngModel)]="selectedLanguage" class="language-select">
-          <option *ngFor="let lang of languages" [value]="lang.value">
-            {{ lang.label }}
-          </option>
-        </select>
-        <div class="language-icon">
-          <i [class]="getCurrentLanguageIcon()"></i>
-        </div>
+    <!-- Navigation Section -->
+    <div class="nav-section">
+      <button class="nav-btn primary" (click)="startNewChat()">
+        <i class="fas fa-plus"></i>
+        New chat
+      </button>
+      
+      <div class="nav-search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search chats" class="search-input">
       </div>
+
+      <!-- Removed extra nav links per request -->
     </div>
+
+
 
     <!-- Chat History Section -->
     <div class="chat-history">
       <div class="chat-history-header">
-        <h3><i class="fas fa-history"></i> Chat History</h3>
-        <button class="new-chat-btn" (click)="startNewChat()" title="Start New Chat">
-          <i class="fas fa-plus"></i>
-        </button>
+        <h3>Chats</h3>
       </div>
+
+
       
       <div class="chat-history-list">
         <!-- Current Chat Indicator -->
         <div *ngIf="chatHistories.length === 0" class="no-history">
-          <i class="fas fa-comments"></i>
           <span>No chat history yet</span>
         </div>
         
         <!-- Chat History Items -->
-        <div 
-          *ngFor="let chat of chatHistories; trackBy: trackByChatId" 
-          class="history-item"
+        <div
+          *ngFor="let chat of chatHistories; trackBy: trackByChatId"
+          class="chat-item"
           [class.active]="chat.id === currentChatId"
           (click)="switchToChat(chat.id)"
           title="{{ chat.title }}">
-          
-          <div class="history-item-content">
-            <div class="history-item-header">
-              <div class="history-language">
-                <i [class]="getLanguageIcon(chat.language)"></i>
-              </div>
-              <div class="history-time">{{ getRelativeTime(chat.timestamp) }}</div>
-              <button 
-                class="delete-chat-btn" 
-                (click)="deleteChat(chat.id, $event)"
-                title="Delete Chat"
-                *ngIf="chatHistories.length > 1">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-            
-            <div class="history-title">{{ chat.title }}</div>
-            <div class="history-preview">{{ chat.lastMessage }}</div>
-            
-            <div class="history-stats">
-              <span class="message-count">
-                <i class="fas fa-comment"></i> {{ chat.messages.length }}
-              </span>
-            </div>
+
+          <div class="chat-item-content">
+            <div class="chat-title">{{ chat.title }}</div>
+            <div class="chat-preview">{{ chat.lastMessage }}</div>
           </div>
+
+          <button
+            class="delete-chat-btn"
+            (click)="deleteChat(chat.id, $event)"
+            title="Delete Chat"
+            *ngIf="chatHistories.length > 1">
+            <i class="fas fa-trash"></i>
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Quick Examples - Hidden per user request
-    <div class="quick-examples">
-      <h3><i class="fas fa-lightbulb"></i> Quick Examples</h3>
-      <div class="example-buttons">
-        <button
-          *ngFor="let example of quickExamples"
-          class="example-btn"
-          (click)="useExample(example)"
-          [disabled]="isLoading">
-          <i [class]="example.icon"></i>
-          {{ example.title }}
-        </button>
-      </div>
-    </div>
-    -->
-
-    <!-- API Key Configuration -->
-    <div class="api-config">
-      <div class="api-config-header">
-        <h3><i class="fas fa-key"></i> API Configuration</h3>
-        <button class="config-toggle" (click)="toggleApiConfig()" [title]="showApiConfig ? 'Hide API Settings' : 'Show API Settings'">
-          <i [class]="showApiConfig ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
-        </button>
-      </div>
-      
-      <div class="api-config-content" [class.expanded]="showApiConfig">
-        <div class="api-key-section">
-          <label class="block text-sm font-medium mb-2">
-            <i class="fas fa-robot"></i> Gemini API Key
-          </label>
-          <div class="api-key-input-group">
-            <input
-              type="password"
-              [(ngModel)]="customApiKey"
-              placeholder="Enter your Gemini API key..."
-              class="api-key-input"
-              [class.has-key]="hasCustomApiKey"
-              (input)="onApiKeyChange()"
-            />
-            <button
-              class="toggle-visibility-btn"
-              (click)="toggleApiKeyVisibility()"
-              [title]="showApiKey ? 'Hide API Key' : 'Show API Key'">
-              <i [class]="showApiKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-            </button>
-          </div>
-          
-          <div class="api-key-actions">
-            <button
-              class="save-key-btn"
-              (click)="saveApiKey()"
-              [disabled]="!customApiKey.trim()"
-              title="Save API Key">
-              <i class="fas fa-save"></i> Save Key
-            </button>
-            <button
-              class="clear-key-btn"
-              (click)="clearApiKey()"
-              [disabled]="!hasCustomApiKey"
-              title="Clear Saved Key">
-              <i class="fas fa-trash"></i> Clear
-            </button>
-          </div>
-          
-          <div class="api-key-status">
-            <div *ngIf="hasCustomApiKey" class="status-success">
-              <i class="fas fa-check-circle"></i>
-              <span>Using your custom API key</span>
-            </div>
-            <div *ngIf="!hasCustomApiKey" class="status-default">
-              <i class="fas fa-info-circle"></i>
-              <span>Using default API key</span>
-            </div>
-          </div>
-          
-          <div class="api-key-help">
-            <p class="help-text">
-              <i class="fas fa-lightbulb"></i>
-              Get your free API key from 
-              <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener">
-                Google AI Studio
-              </a>
-            </p>
-          </div>
+    <!-- User Profile Section -->
+    <div class="user-profile">
+      <div class="profile-info">
+        <div class="profile-avatar">
+          <span>{{ (userDisplayName || 'U').charAt(0).toUpperCase() }}</span>
+        </div>
+        <div class="profile-details">
+          <span class="profile-name">{{ userDisplayName || 'User' }}</span>
+          <span class="profile-plan">Free</span>
         </div>
       </div>
     </div>
+
+
+
+    <!-- API Configuration moved to Settings modal per request -->
 
     <!-- Chat Actions -->
     <div class="chat-actions">
@@ -204,12 +124,25 @@
 
   <!-- Main Content -->
   <div class="main-content">
-    <!-- Mobile Header -->
-    <div class="mobile-header md:hidden">
-      <button class="sidebar-toggle" (click)="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-      </button>
-      <h1><i class="fas fa-robot"></i> AutoCoder.ai</h1>
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <button class="sidebar-toggle-btn" (click)="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="chat-title">{{ getCurrentChatTitle() }}</h1>
+        <button class="dropdown-btn">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+      <div class="chat-header-right">
+        <button class="header-btn" (click)="shareChat()" title="Share Chat">
+          <i class="fas fa-share"></i>
+        </button>
+        <button class="header-btn" (click)="openProfileModal()" title="More Options">
+          <i class="fas fa-ellipsis-h"></i>
+        </button>
+      </div>
     </div>
 
     <!-- Chat Container -->
@@ -263,13 +196,6 @@
         </div>
 
         <div class="message-content">
-          <div class="message-header">
-            <span class="message-role">
-              {{ message.role === 'user' ? 'You' : message.role === 'assistant' ? 'AutoCoder.ai' : 'System' }}
-            </span>
-            <span class="message-time">{{ message.timestamp | date:'short' }}</span>
-          </div>
-          
           <div class="message-text" [innerHTML]="message.content"></div>
           
           <!-- Display generated code if available -->
@@ -288,14 +214,17 @@
           
           <!-- Action Buttons for Assistant Messages -->
           <div *ngIf="message.role === 'assistant'" class="message-actions">
-            <button class="action-btn-sm" (click)="copyToClipboard(message.code || message.content)" title="Copy">
-              <i class="fas fa-copy"></i>
+            <button class="action-btn-sm" (click)="copyToClipboard(message.code || message.content)" title="Like">
+              <i class="fas fa-thumbs-up"></i>
             </button>
-            <button *ngIf="message.code" 
-                    class="action-btn-sm" 
-                    (click)="showPreviewMethod(message.code)" 
-                    title="Open Live Preview in New Tab">
-              <i class="fas fa-external-link-alt"></i>
+            <button class="action-btn-sm" (click)="copyToClipboard(message.code || message.content)" title="Dislike">
+              <i class="fas fa-thumbs-down"></i>
+            </button>
+            <button class="action-btn-sm" (click)="startVoiceInput()" title="Read Aloud">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <button class="action-btn-sm" (click)="showPreviewMethod(message.code)" title="Upload">
+              <i class="fas fa-upload"></i>
             </button>
             <button class="action-btn-sm" (click)="regenerateResponse(message)" title="Regenerate">
               <i class="fas fa-redo"></i>
@@ -304,7 +233,7 @@
         </div>
       </div>
 
-      <!-- Loading Message -->
+      <!-- Enhanced Loading Message -->
       <div *ngIf="isLoading" class="message assistant-message loading-message">
         <div class="message-avatar">
           <i class="fas fa-robot magic-pulse"></i>
@@ -321,22 +250,25 @@
               <div class="magic-line">⚡ Almost ready to amaze you...</div>
             </div>
             <div class="typing-indicator">
-              <span></span>
-              <span></span>
-              <span></span>
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Input Area -->
+    <!-- Enhanced Input Area -->
     <div class="input-area">
       <div class="input-container">
         <div class="input-wrapper">
+          <button class="voice-input-btn" (click)="startVoiceInput()" title="Voice Input">
+            <i class="fas fa-microphone"></i>
+          </button>
           <textarea
             [(ngModel)]="userInput"
-            placeholder="Ask me anything about coding... (Shift + Enter for new line)"
+            placeholder="Ask me anything about coding... (Type /shortcuts for help)"
             class="user-input"
             rows="1"
             (keydown)="onKeyDown($event)"
@@ -354,8 +286,7 @@
         </div>
         <div class="input-footer">
           <span class="input-hint">
-            <i class="fas fa-keyboard"></i>
-            Press Enter to send, Shift + Enter for new line
+            AutoCoder.ai can make mistakes. Check important info.
           </span>
         </div>
       </div>
@@ -365,14 +296,23 @@
   <!-- Sidebar Overlay for Mobile -->
   <div *ngIf="sidebarVisible" class="sidebar-overlay md:hidden" (click)="toggleSidebar()"></div>
 
+  <!-- Success Celebration Overlay -->
+  <div *ngIf="showConfetti" class="success-celebration">
+    <div class="celebration-content">
+      <div class="celebration-icon">🎉</div>
+      <div class="celebration-title">Code Generated Successfully!</div>
+      <div class="celebration-subtitle">Your amazing creation is ready to use</div>
+    </div>
+  </div>
+
   <!-- Profile Modal -->
   <div *ngIf="showProfileModal" class="profile-modal-overlay" (click)="closeProfileModal()">
     <div class="profile-modal" (click)="$event.stopPropagation()">
       <!-- Modal Header -->
       <div class="modal-header">
         <h2>
-          <i class="fas fa-user-cog"></i>
-          Profile & Settings
+          <i class="fas fa-cogs"></i>
+          AutoCoder.ai Settings
         </h2>
         <button class="close-btn" (click)="closeProfileModal()">
           <i class="fas fa-times"></i>
@@ -407,36 +347,128 @@
           </div>
         </div>
 
-        <!-- Settings Section -->
+        <!-- Language Settings -->
         <div class="settings-section">
           <h4>
-            <i class="fas fa-cog"></i>
-            App Settings
+            <i class="fas fa-code"></i>
+            Programming Language
           </h4>
-          
-          <div class="setting-items">
-            <div class="setting-item">
-              <div class="setting-info">
-                <i class="fas fa-palette"></i>
-                <span>Theme</span>
-              </div>
-              <span class="setting-value">Dark Mode</span>
+          <div class="language-selector-modal">
+            <select [(ngModel)]="selectedLanguage" class="language-select-modal">
+              <option *ngFor="let lang of languages" [value]="lang.value">
+                {{ lang.label }}
+              </option>
+            </select>
+            <div class="language-icon-modal">
+              <i [class]="getCurrentLanguageIcon()"></i>
             </div>
-            
-            <div class="setting-item">
-              <div class="setting-info">
-                <i class="fas fa-code"></i>
-                <span>Syntax Highlighting</span>
-              </div>
-              <span class="setting-value active">Enabled</span>
+          </div>
+        </div>
+
+        <!-- Quick Examples Section -->
+        <div class="settings-section">
+          <h4>
+            <i class="fas fa-lightbulb"></i>
+            Quick Examples
+          </h4>
+
+          <!-- Category Filter in Modal -->
+          <div class="category-filter-modal">
+            <button
+              *ngFor="let category of categories"
+              class="category-btn-modal"
+              [class.active]="selectedCategory === category"
+              (click)="selectCategory(category)">
+              {{ category }}
+            </button>
+          </div>
+
+          <div class="example-buttons-modal">
+            <button
+              *ngFor="let example of getFilteredExamples()"
+              class="example-btn-modal feature-highlight"
+              (click)="useQuickExample(example); closeProfileModal()"
+              [disabled]="isLoading"
+              [title]="example.prompt">
+              <i [class]="example.icon"></i>
+              {{ example.title }}
+              <span class="category-badge-modal">{{ example.category }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Advanced Tools Section removed per request -->
+
+        <!-- Quick Actions Section removed per request -->
+
+        <!-- General Settings Section removed per request -->
+
+        <!-- API Configuration (moved from sidebar) -->
+        <div class="settings-section">
+          <h4>
+            <i class="fas fa-key"></i>
+            API Configuration
+          </h4>
+
+          <div class="api-config">
+            <div class="api-key-section">
+            <label class="block text-sm font-medium mb-2">
+              <i class="fas fa-robot"></i> Gemini API Key
+            </label>
+            <div class="api-key-input-group">
+              <input
+                type="password"
+                [(ngModel)]="customApiKey"
+                placeholder="Enter your Gemini API key..."
+                class="api-key-input"
+                [class.has-key]="hasCustomApiKey"
+                (input)="onApiKeyChange()"
+              />
+              <button
+                class="toggle-visibility-btn"
+                (click)="toggleApiKeyVisibility()"
+                [title]="showApiKey ? 'Hide API Key' : 'Show API Key'">
+                <i [class]="showApiKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
             </div>
-            
-            <div class="setting-item">
-              <div class="setting-info">
-                <i class="fas fa-save"></i>
-                <span>Auto-save Chat</span>
+
+            <div class="api-key-actions">
+              <button
+                class="save-key-btn"
+                (click)="saveApiKey()"
+                [disabled]="!customApiKey.trim()"
+                title="Save API Key">
+                <i class="fas fa-save"></i> Save Key
+              </button>
+              <button
+                class="clear-key-btn"
+                (click)="clearApiKey()"
+                [disabled]="!hasCustomApiKey"
+                title="Clear Saved Key">
+                <i class="fas fa-trash"></i> Clear
+              </button>
+            </div>
+
+            <div class="api-key-status">
+              <div *ngIf="hasCustomApiKey" class="status-success">
+                <i class="fas fa-check-circle"></i>
+                <span>Using your custom API key</span>
               </div>
-              <span class="setting-value active">On</span>
+              <div *ngIf="!hasCustomApiKey" class="status-default">
+                <i class="fas fa-info-circle"></i>
+                <span>Using default API key</span>
+              </div>
+            </div>
+
+            <div class="api-key-help">
+              <p class="help-text">
+                <i class="fas fa-lightbulb"></i>
+                Get your free API key from 
+                <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener">
+                  Google AI Studio
+                </a>
+              </p>
+            </div>
             </div>
           </div>
         </div>

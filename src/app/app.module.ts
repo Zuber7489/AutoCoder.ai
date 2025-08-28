@@ -13,6 +13,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { AuthService } from './services/auth.service';
 import { SettingsComponent } from './components/settings/settings.component';
+import { ParticleBackgroundComponent } from './components/particle-background/particle-background.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { SettingsComponent } from './components/settings/settings.component';
     LoginComponent,
     DashboardComponent,
     NavbarComponent,
-    SettingsComponent
+    SettingsComponent,
+    ParticleBackgroundComponent
   ],
   imports: [
     BrowserModule,

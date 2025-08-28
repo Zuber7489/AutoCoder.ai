@@ -1,34 +1,39 @@
+<!-- Particle Background -->
+<app-particle-background></app-particle-background>
+
 <!-- Hero Section -->
-<div class="relative overflow-hidden bg-gray-900 min-h-screen flex items-center">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="relative overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 min-h-screen flex items-center">
+  <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
     <div class="text-center">
-      <h1 class="text-6xl md:text-7xl font-bold text-white mb-6">
+      <h1 class="text-6xl md:text-7xl font-bold text-white mb-6 animate-fade-in-up hero-title">
         Build Code with
-        <span class="bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 bg-clip-text text-transparent"> AI Magic</span>
+        <span class="animated-gradient-text bg-clip-text text-transparent"> AI Magic</span>
       </h1>
-      <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+      <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
         Transform your ideas into production-ready code instantly. Our AI-powered platform generates, optimizes, and deploys your applications with enterprise-grade quality.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <button 
+        <button
           (click)="navigateToLogin()"
-          class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+          class="cta-button-primary bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 magnetic-button"
         >
           <i class="fas fa-rocket mr-2"></i>Start Building Now
         </button>
-        <button 
+        <button
           (click)="navigateToFeatures()"
-          class="border-2 border-gray-600 text-gray-300 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 transition-all duration-200"
+          class="border-2 border-gray-600 text-gray-300 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-1 magnetic-button"
         >
           Explore Features
         </button>
       </div>
     </div>
     
-    <!-- Floating Elements -->
-    <div class="absolute top-20 left-10 w-20 h-20 bg-blue-400/20 rounded-full blur-xl animate-pulse"></div>
-    <div class="absolute top-40 right-20 w-32 h-32 bg-purple-400/20 rounded-full blur-xl animate-pulse delay-1000"></div>
-    <div class="absolute bottom-20 left-1/4 w-16 h-16 bg-pink-400/20 rounded-full blur-xl animate-pulse delay-500"></div>
+    <!-- Enhanced Floating Elements -->
+    <div class="absolute top-20 left-10 w-20 h-20 bg-blue-400/20 rounded-full blur-xl animate-float opacity-60"></div>
+    <div class="absolute top-40 right-20 w-32 h-32 bg-purple-400/20 rounded-full blur-xl animate-float opacity-60" style="animation-delay: -2s;"></div>
+    <div class="absolute bottom-20 left-1/4 w-16 h-16 bg-pink-400/20 rounded-full blur-xl animate-float opacity-60" style="animation-delay: -4s;"></div>
+    <div class="absolute top-1/2 right-10 w-12 h-12 bg-green-400/20 rounded-full blur-xl animate-float opacity-40" style="animation-delay: -1s;"></div>
   </div>
 </div>
 
@@ -40,10 +45,10 @@
       <p class="text-xl text-gray-400">Cutting-edge features that make coding effortless</p>
     </div>
     
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 feature-grid">
       <!-- Feature 1 -->
-      <div class="bg-gray-700/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-600/50 hover:border-blue-500/50 transition-all duration-300 hover:transform hover:-translate-y-2">
-        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg mb-6 flex items-center justify-center">
+      <div class="feature-card bg-gray-700/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-600/50 hover:border-blue-500/50">
+        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg mb-6 flex items-center justify-center feature-icon">
           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
@@ -53,8 +58,8 @@
       </div>
 
       <!-- Feature 2 -->
-      <div class="bg-gray-700/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-600/50 hover:border-blue-500/50 transition-all duration-300 hover:transform hover:-translate-y-2">
-        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg mb-6 flex items-center justify-center">
+      <div class="feature-card bg-gray-700/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-600/50 hover:border-blue-500/50">
+        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg mb-6 flex items-center justify-center feature-icon">
           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
@@ -64,8 +69,8 @@
       </div>
 
       <!-- Feature 3 -->
-      <div class="bg-gray-700/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-600/50 hover:border-blue-500/50 transition-all duration-300 hover:transform hover:-translate-y-2">
-        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg mb-6 flex items-center justify-center">
+      <div class="feature-card bg-gray-700/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-600/50 hover:border-blue-500/50">
+        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg mb-6 flex items-center justify-center feature-icon">
           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -93,15 +98,15 @@
     <h2 class="text-4xl font-bold text-white mb-6">Ready to Transform Your Development?</h2>
     <p class="text-xl text-gray-400 mb-8">Join thousands of developers who are already building faster with AI</p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <button 
+      <button
         (click)="navigateToLogin()"
-        class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+        class="cta-button-primary bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 magnetic-button"
       >
         Get Started Free
       </button>
-      <button 
+      <button
         (click)="navigateToPricing()"
-        class="border-2 border-gray-600 text-gray-300 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 transition-all duration-200"
+        class="border-2 border-gray-600 text-gray-300 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-1 magnetic-button"
       >
         View Pricing
       </button>

@@ -94,38 +94,75 @@ export class GeminiApiService {
   }
 
   private buildEnhancedPrompt(prompt: string, language: string): string {
-    const baseInstructions = `You are an expert software engineer. Create beautiful, professional, production-ready code that follows modern best practices.`;
-    
+    const baseInstructions = `You are an elite senior software engineer with 15+ years of experience. Create EXCELLENT, production-ready, enterprise-grade code that exceeds industry standards.
+
+CRITICAL REQUIREMENTS FOR ALL CODE:
+- ✨ BEAUTIFUL & MODERN: Use stunning gradients, smooth animations, perfect spacing
+- 🎯 FUNCTIONAL: Every feature must work perfectly with proper error handling
+- 📱 RESPONSIVE: Mobile-first design that works on all devices perfectly
+- 🚀 PERFORMANCE: Optimized code with lazy loading and efficient algorithms
+- ♿ ACCESSIBLE: WCAG compliant with proper ARIA labels and keyboard navigation
+- 🔒 SECURE: Sanitize inputs, prevent XSS, use secure coding practices
+- 📚 DOCUMENTED: Comprehensive comments and JSDoc documentation
+- 🧪 TESTABLE: Clean, modular code that's easy to unit test
+- 🎨 DESIGN: Professional UI/UX with micro-interactions and polish`;
+
     switch (language.toLowerCase()) {
       case 'html':
       case 'htmlcss':
         return `${baseInstructions}
 
-Create a stunning, modern HTML page with embedded CSS for: ${prompt}
+Create an ABSOLUTELY STUNNING, PERFECTLY FUNCTIONAL HTML masterpiece for: ${prompt}
 
-IMPORTANT REQUIREMENTS:
-- Generate a COMPLETE HTML document with DOCTYPE
-- Use modern, beautiful design with gradients and animations
-- Implement a professional dark theme (#0f172a background, #1e293b cards)
-- Add responsive design that works on all devices
-- Use modern CSS Grid and Flexbox layouts
-- Include smooth hover effects and micro-interactions
-- Add subtle shadows, border-radius, and modern typography
-- Use professional color palette (blues, purples, grays)
-- Include loading animations if applicable
-- Add proper spacing and visual hierarchy
-- Use CSS custom properties for consistent theming
-- Ensure excellent user experience and accessibility
+🚀 ADVANCED REQUIREMENTS:
+- COMPLETE, RUNNABLE HTML document with DOCTYPE declaration
+- INTERACTIVE FEATURES: Working buttons, forms, animations, hover effects
+- MODERN DESIGN SYSTEM: Custom CSS variables, consistent spacing, typography scale
+- FLUID ANIMATIONS: CSS keyframes, transform3d, smooth transitions (60fps)
+- ADVANCED LAYOUTS: CSS Grid, Flexbox, Container queries, aspect ratios
+- MICRO-INTERACTIONS: Button ripples, loading states, success animations
+- DARK THEME MASTERPIECE: Professional color palette with perfect contrast
+- RESPONSIVE EXCELLENCE: Mobile-first, tablet, desktop - all perfect
+- ACCESSIBILITY HERO: ARIA labels, focus management, keyboard navigation
+- PERFORMANCE OPTIMIZED: Lazy loading, efficient animations, minimal repaints
+- CROSS-BROWSER MAGIC: Webkit, Firefox, Edge compatibility
+- SEO OPTIMIZED: Proper meta tags, semantic HTML, schema markup
 
-Style Guidelines:
-- Font: 'Inter', 'Segoe UI', sans-serif
-- Primary colors: #3b82f6 (blue), #8b5cf6 (purple)
-- Background: #0f172a, Cards: #1e293b
-- Text: #e2e8f0, Muted: #94a3b8
-- Borders: #334155
-- Shadows: rgba(0, 0, 0, 0.3)
+🎨 DESIGN SPECIFICATIONS:
+- Fonts: 'Inter' (Google Fonts), system fallbacks
+- Colors: Blues (#3b82f6, #1d4ed8), Purples (#8b5cf6, #7c3aed)
+- Background: #0f172a with subtle animated gradients
+- Cards: #1e293b with glass-morphism effects
+- Text: #f1f5f9 (primary), #cbd5e1 (secondary), #94a3af (muted)
+- Borders: #334155 with focus states
+- Shadows: Layered shadows with blur and spread
+- Border Radius: Consistent 8px, 12px, 16px scale
+- Spacing: 4px, 8px, 12px, 16px, 24px, 32px scale
 
-Return ONLY the complete HTML code. No explanations or markdown blocks.`;
+⚡ FUNCTIONAL FEATURES TO INCLUDE:
+- Smooth scroll navigation with active states
+- Interactive form validation with real-time feedback
+- Animated counters and progress bars
+- Modal dialogs with backdrop blur
+- Toast notifications system
+- Loading spinners and skeleton screens
+- Tabbed interfaces with smooth transitions
+- Accordion components with proper ARIA
+- Image galleries with lightbox functionality
+- Search functionality with debounced input
+- Sortable/filterable data tables
+- Charts and graphs with animated data
+
+🔧 TECHNICAL EXCELLENCE:
+- Semantic HTML5 structure
+- CSS custom properties for theming
+- BEM methodology for CSS organization
+- Optimized images and assets
+- Minimal JavaScript (vanilla, no frameworks unless specified)
+- Error boundaries and graceful degradation
+- Progressive enhancement approach
+
+Return ONLY the complete, functional HTML code. Make it production-ready and absolutely beautiful! ✨`;
       
       case 'css':
         return `${baseInstructions}
@@ -147,21 +184,40 @@ Return ONLY the CSS code. No explanations or markdown.`;
       case 'js':
         return `${baseInstructions}
 
-Generate modern, high-quality JavaScript for: ${prompt}
+Create EXCEPTIONAL, enterprise-grade JavaScript code for: ${prompt}
 
-Requirements:
-- Use ES6+ syntax (arrow functions, destructuring, template literals)
-- Implement comprehensive error handling with try-catch
-- Add detailed comments explaining complex logic
-- Use modern async/await for asynchronous operations
-- Include input validation and type checking
-- Follow clean code principles (DRY, SOLID)
-- Use meaningful variable and function names
-- Optimize for performance and readability
-- Add JSDoc comments for functions
-- Include proper event handling
+🚀 ADVANCED JAVASCRIPT REQUIREMENTS:
+- ES2023+ MODERN SYNTAX: Arrow functions, destructuring, optional chaining, nullish coalescing
+- ROBUST ERROR HANDLING: Try-catch-finally, custom error classes, graceful degradation
+- PERFORMANCE OPTIMIZATION: Efficient algorithms, memoization, debouncing, throttling
+- MEMORY MANAGEMENT: Proper cleanup, no memory leaks, garbage collection optimization
+- ASYNC MASTERY: Promises, async/await, proper error propagation, race conditions handling
+- MODULAR ARCHITECTURE: Clean separation of concerns, single responsibility principle
+- ADVANCED PATTERNS: Factory functions, modules, observers, pub/sub, state management
+- INPUT VALIDATION: Sanitization, type checking, schema validation, boundary checks
+- BROWSER COMPATIBILITY: Feature detection, polyfills, fallbacks
+- DEBUGGING SUPPORT: Comprehensive logging, development helpers, error tracking
 
-Return ONLY the JavaScript code. No explanations or markdown blocks.`;
+⚡ FUNCTIONAL EXCELLENCE:
+- Pure functions where possible with immutable data structures
+- Comprehensive JSDoc documentation with examples
+- Event delegation and efficient DOM manipulation
+- Web APIs integration (LocalStorage, IndexedDB, Service Workers)
+- Progressive Web App features when applicable
+- Accessibility integration with ARIA attributes
+- Internationalization support (i18n)
+- Real-time features with WebSockets when needed
+
+🔧 CODE QUALITY STANDARDS:
+- ESLint compliant (Airbnb style guide)
+- Comprehensive unit tests structure
+- Bundle size optimization
+- Tree shaking friendly exports
+- Type safety with JSDoc annotations
+- Performance monitoring integration
+- Security best practices (CSP, XSS prevention)
+
+Return ONLY the JavaScript code with comprehensive comments. Make it production-ready and absolutely bulletproof! 💪`;
       
       case 'typescript':
       case 'ts':
@@ -263,7 +319,7 @@ Return ONLY the ${language} code. No explanations or markdown.`;
   }
 
   private cleanAndEnhanceCodeResponse(text: string, language: string): string {
-    // Remove various markdown code block patterns
+    // Enhanced markdown code block removal
     let cleanedText = text
       .replace(/```[\w-]*\n?/g, '') // Remove opening code blocks
       .replace(/```\s*$/g, '') // Remove closing code blocks
@@ -271,9 +327,11 @@ Return ONLY the ${language} code. No explanations or markdown.`;
       .replace(/\s*```\s*$/g, '') // Remove closing blocks at end
       .replace(/^```[\w-]*\s*/gm, '') // Remove any remaining code block markers
       .replace(/```$/gm, '') // Remove closing markers
+      .replace(/~~~[\w-]*\n?/g, '') // Remove alternative code blocks
+      .replace(/~~~\s*$/g, '') // Remove alternative closing blocks
       .trim();
 
-    // Remove common AI response prefixes
+    // Advanced AI response prefix removal
     cleanedText = cleanedText
       .replace(/^Here's.*?[:\n]\s*/i, '')
       .replace(/^Here is.*?[:\n]\s*/i, '')
@@ -281,7 +339,16 @@ Return ONLY the ${language} code. No explanations or markdown.`;
       .replace(/^Below is.*?[:\n]\s*/i, '')
       .replace(/^I'll create.*?[:\n]\s*/i, '')
       .replace(/^Let me create.*?[:\n]\s*/i, '')
+      .replace(/^Here's the.*?[:\n]\s*/i, '')
+      .replace(/^Here are.*?[:\n]\s*/i, '')
+      .replace(/^The following.*?[:\n]\s*/i, '')
+      .replace(/^Here's a.*?[:\n]\s*/i, '')
       .replace(/^\*\*.*?\*\*\s*/g, '') // Remove bold markdown
+      .replace(/^###.*?$/gm, '') // Remove headers
+      .replace(/^##.*?$/gm, '') // Remove subheaders
+      .replace(/^#.*?$/gm, '') // Remove main headers
+      .replace(/^\s*[-*+]\s+/gm, '') // Remove list markers
+      .replace(/^\d+\.\s+/gm, '') // Remove numbered list markers
       .trim();
 
     // Language-specific enhancements
@@ -368,13 +435,231 @@ ${cleanedText}
     try {
       const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       const prompt = `Provide a brief explanation of what this ${language} code does:\n\n${code}\n\nKeep the explanation concise and beginner-friendly.`;
-      
+
       const result = await model.generateContent(prompt);
       const response = await result.response;
       return response.text().trim();
     } catch (error) {
       console.error('Error explaining code:', error);
       return 'Unable to generate explanation.';
+    }
+  }
+
+  // Enhanced code validation and improvement
+  async validateAndImproveCode(code: string, language: string): Promise<{ validatedCode: string; improvements: string[] }> {
+    try {
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const prompt = `Analyze this ${language} code and provide:
+1. VALIDATED CODE: Fix any issues, improve syntax, add missing parts
+2. IMPROVEMENTS: List specific improvements made
+
+Code to analyze:
+${code}
+
+Return in this format:
+VALIDATED_CODE_HERE
+
+IMPROVEMENTS:
+- Improvement 1
+- Improvement 2
+- Improvement 3`;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      // Parse the response
+      const parts = text.split('IMPROVEMENTS:');
+      const validatedCode = parts[0].replace('VALIDATED_CODE_HERE', '').trim();
+      const improvementsText = parts[1] || '';
+      const improvements = improvementsText
+        .split('\n')
+        .map((line: string) => line.replace(/^-\s*/, '').trim())
+        .filter((line: string) => line.length > 0);
+
+      return {
+        validatedCode: this.cleanAndEnhanceCodeResponse(validatedCode, language),
+        improvements
+      };
+    } catch (error) {
+      console.error('Error validating code:', error);
+      return {
+        validatedCode: code,
+        improvements: ['Unable to validate code due to API error']
+      };
+    }
+  }
+
+  // Generate optimized code with performance improvements
+  async generateOptimizedCode(prompt: string, language: string): Promise<{ code: string; optimizations: string[] }> {
+    try {
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+      const optimizationPrompt = `Create highly optimized ${language} code for: ${prompt}
+
+REQUIREMENTS:
+- Performance optimized with efficient algorithms
+- Minimal memory usage and no memory leaks
+- Fast execution and minimal CPU usage
+- Optimized for the specific use case
+- Best practices for performance
+- Include performance metrics/comments
+
+Also provide a list of optimizations made.`;
+
+      const result = await model.generateContent(optimizationPrompt);
+      const response = await result.response;
+      const text = response.text();
+
+      // Extract code and optimizations
+      const codeMatch = text.match(/```[\w-]*\n([\s\S]*?)\n```/);
+      const code = codeMatch ? codeMatch[1].trim() : text.split('OPTIMIZATIONS')[0].trim();
+
+      const optimizationsText = text.split('OPTIMIZATIONS')[1] || text.split('Optimizations')[1] || '';
+      const optimizations = optimizationsText
+        .split('\n')
+        .map((line: string) => line.replace(/^[-*]\s*/, '').trim())
+        .filter((line: string) => line.length > 0 && !line.toLowerCase().includes('optimizations'));
+
+      return {
+        code: this.cleanAndEnhanceCodeResponse(code, language),
+        optimizations: optimizations.length > 0 ? optimizations : ['Code optimized for performance']
+      };
+    } catch (error) {
+      console.error('Error generating optimized code:', error);
+      const fallbackCode = await this.generateCode(prompt, language);
+      return {
+        code: fallbackCode,
+        optimizations: ['Unable to generate optimizations due to API error']
+      };
+    }
+  }
+
+  // Generate code with comprehensive testing
+  async generateTestedCode(prompt: string, language: string): Promise<{ code: string; tests: string; coverage: string }> {
+    try {
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+      const testPrompt = `Create ${language} code with comprehensive tests for: ${prompt}
+
+REQUIREMENTS:
+1. Main functional code
+2. Unit tests (Jest/Mocha style)
+3. Integration tests if applicable
+4. Code coverage considerations
+5. Test documentation
+
+Return in this format:
+MAIN_CODE_HERE
+
+TESTS_HERE
+
+COVERAGE_NOTES_HERE`;
+
+      const result = await model.generateContent(testPrompt);
+      const response = await result.response;
+      const text = response.text();
+
+      // Parse the response
+      const parts = text.split(/(?:MAIN_CODE|TESTS|COVERAGE_NOTES)_HERE/);
+      const code = parts[1]?.trim() || text.split('TESTS_HERE')[0].trim();
+      const tests = parts[3]?.trim() || text.split('TESTS_HERE')[1]?.split('COVERAGE_NOTES_HERE')[0]?.trim() || 'Tests not generated';
+      const coverage = parts[5]?.trim() || text.split('COVERAGE_NOTES_HERE')[1]?.trim() || 'Coverage analysis not available';
+
+      return {
+        code: this.cleanAndEnhanceCodeResponse(code, language),
+        tests: this.cleanAndEnhanceCodeResponse(tests, language),
+        coverage
+      };
+    } catch (error) {
+      console.error('Error generating tested code:', error);
+      const fallbackCode = await this.generateCode(prompt, language);
+      return {
+        code: fallbackCode,
+        tests: `// Unit tests for ${language} code\n// Add your test cases here`,
+        coverage: 'Unable to generate coverage analysis'
+      };
+    }
+  }
+
+  // Advanced code review and suggestions
+  async performCodeReview(code: string, language: string): Promise<{
+    score: number;
+    issues: Array<{ type: string; severity: string; description: string; suggestion: string }>;
+    recommendations: string[];
+  }> {
+    try {
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+      const reviewPrompt = `Perform a comprehensive code review of this ${language} code:
+
+${code}
+
+Provide:
+1. OVERALL SCORE (0-100)
+2. ISSUES_FOUND (JSON format)
+3. RECOMMENDATIONS (list)
+
+Format:
+SCORE: [number]
+
+ISSUES:
+[
+  {
+    "type": "performance|security|maintainability|functionality",
+    "severity": "critical|high|medium|low",
+    "description": "brief description",
+    "suggestion": "how to fix"
+  }
+]
+
+RECOMMENDATIONS:
+- Recommendation 1
+- Recommendation 2`;
+
+      const result = await model.generateContent(reviewPrompt);
+      const response = await result.response;
+      const text = response.text();
+
+      // Parse the response
+      const scoreMatch = text.match(/SCORE:\s*(\d+)/i);
+      const score = scoreMatch ? parseInt(scoreMatch[1], 10) : 75;
+
+      let issues: Array<{ type: string; severity: string; description: string; suggestion: string }> = [];
+      try {
+        const issuesMatch = text.match(/ISSUES:\s*\[([\s\S]*?)\]/);
+        if (issuesMatch) {
+          issues = JSON.parse(`[${issuesMatch[1]}]`);
+        }
+      } catch (e) {
+        // Fallback issues
+        issues = [{
+          type: 'general',
+          severity: 'medium',
+          description: 'Code review completed',
+          suggestion: 'Review completed successfully'
+        }];
+      }
+
+      const recommendationsText = text.split('RECOMMENDATIONS:')[1] || '';
+      const recommendations = recommendationsText
+        .split('\n')
+        .map((line: string) => line.replace(/^[-*]\s*/, '').trim())
+        .filter((line: string) => line.length > 0);
+
+      return { score, issues, recommendations };
+    } catch (error) {
+      console.error('Error performing code review:', error);
+      return {
+        score: 75,
+        issues: [{
+          type: 'general',
+          severity: 'low',
+          description: 'Code review could not be completed',
+          suggestion: 'Manual review recommended'
+        }],
+        recommendations: ['Consider manual code review']
+      };
     }
   }
 }

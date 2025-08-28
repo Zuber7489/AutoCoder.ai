@@ -1,0 +1,38 @@
+.particle-canvas {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg,
+    rgba(15, 23, 42, 0.95) 0%,
+    rgba(30, 41, 59, 0.95) 50%,
+    rgba(51, 65, 85, 0.95) 100%);
+  opacity: 0.8;
+
+  // Performance optimizations
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+
+  // Ensure smooth animations
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+// Add subtle vignette effect
+.particle-canvas::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    rgba(0, 0, 0, 0.1) 70%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
