@@ -1576,33 +1576,7 @@ What amazing project would you like to build today? ✨`);
     }
   }
 
-  // Smart suggestions based on user input
-  getSmartSuggestions(input: string): string[] {
-    const suggestions: string[] = [];
-    const lowerInput = input.toLowerCase();
 
-    if (lowerInput.includes('button')) {
-      suggestions.push('Add hover effects and smooth transitions');
-      suggestions.push('Include loading states and accessibility features');
-    }
-
-    if (lowerInput.includes('form')) {
-      suggestions.push('Add form validation and error handling');
-      suggestions.push('Include success animations and user feedback');
-    }
-
-    if (lowerInput.includes('animation')) {
-      suggestions.push('Use CSS keyframes for smooth animations');
-      suggestions.push('Consider performance with transform and opacity');
-    }
-
-    if (lowerInput.includes('responsive')) {
-      suggestions.push('Use mobile-first approach with breakpoints');
-      suggestions.push('Test on various screen sizes and orientations');
-    }
-
-    return suggestions.slice(0, 3);
-  }
 
 
 
