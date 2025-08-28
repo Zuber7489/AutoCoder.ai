@@ -128,16 +128,7 @@ Create an ABSOLUTELY STUNNING, PERFECTLY FUNCTIONAL HTML masterpiece for: ${prom
 - CROSS-BROWSER MAGIC: Webkit, Firefox, Edge compatibility
 - SEO OPTIMIZED: Proper meta tags, semantic HTML, schema markup
 
-🎨 DESIGN SPECIFICATIONS:
-- Fonts: 'Inter' (Google Fonts), system fallbacks
-- Colors: Blues (#3b82f6, #1d4ed8), Purples (#8b5cf6, #7c3aed)
-- Background: #0f172a with subtle animated gradients
-- Cards: #1e293b with glass-morphism effects
-- Text: #f1f5f9 (primary), #cbd5e1 (secondary), #94a3af (muted)
-- Borders: #334155 with focus states
-- Shadows: Layered shadows with blur and spread
-- Border Radius: Consistent 8px, 12px, 16px scale
-- Spacing: 4px, 8px, 12px, 16px, 24px, 32px scale
+
 
 ⚡ FUNCTIONAL FEATURES TO INCLUDE:
 - Smooth scroll navigation with active states
