@@ -8,6 +8,21 @@ export interface CodeGenerationResponse {
   suggestions?: string[];
 }
 
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  language?: string;
+}
+
+export interface ConversationContext {
+  id: string;
+  messages: ChatMessage[];
+  createdAt: Date;
+  updatedAt: Date;
+  title?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -15,11 +30,16 @@ export class GeminiApiService {
   private genAI: any;
   private defaultApiKey: string;
   private currentApiKey: string;
+  private conversations: Map<string, ConversationContext> = new Map();
+  private currentConversationId: string | null = null;
+  private readonly MAX_CONVERSATION_LENGTH = 50; // Maximum messages per conversation
+  private readonly STORAGE_KEY = 'gemini_conversations';
 
   constructor() {
     this.defaultApiKey = environment.geminiApiKey;
     this.currentApiKey = this.getStoredApiKey() || this.defaultApiKey;
     this.initializeGeminiAI();
+    this.loadConversationsFromStorage();
   }
 
   private getStoredApiKey(): string | null {
@@ -49,40 +69,177 @@ export class GeminiApiService {
     return this.currentApiKey !== this.defaultApiKey;
   }
 
+  // Conversation Management Methods
+  private loadConversationsFromStorage(): void {
+    try {
+      const stored = localStorage.getItem(this.STORAGE_KEY);
+      if (stored) {
+        const parsedConversations = JSON.parse(stored);
+        // Convert date strings back to Date objects
+        Object.values(parsedConversations).forEach((conv: any) => {
+          conv.createdAt = new Date(conv.createdAt);
+          conv.updatedAt = new Date(conv.updatedAt);
+          conv.messages.forEach((msg: any) => {
+            msg.timestamp = new Date(msg.timestamp);
+          });
+          this.conversations.set(conv.id, conv);
+        });
+      }
+    } catch (error) {
+      console.error('Error loading conversations from storage:', error);
+    }
+  }
+
+  private saveConversationsToStorage(): void {
+    try {
+      const conversationsObject = Object.fromEntries(this.conversations);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(conversationsObject));
+    } catch (error) {
+      console.error('Error saving conversations to storage:', error);
+    }
+  }
+
+  startNewConversation(title?: string): string {
+    const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const conversation: ConversationContext = {
+      id: conversationId,
+      messages: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      title: title || 'New Conversation'
+    };
+
+    this.conversations.set(conversationId, conversation);
+    this.currentConversationId = conversationId;
+    this.saveConversationsToStorage();
+    return conversationId;
+  }
+
+  setCurrentConversation(conversationId: string): boolean {
+    if (this.conversations.has(conversationId)) {
+      this.currentConversationId = conversationId;
+      return true;
+    }
+    return false;
+  }
+
+  getCurrentConversation(): ConversationContext | null {
+    return this.currentConversationId ? this.conversations.get(this.currentConversationId) || null : null;
+  }
+
+  getAllConversations(): ConversationContext[] {
+    return Array.from(this.conversations.values()).sort((a, b) =>
+      b.updatedAt.getTime() - a.updatedAt.getTime()
+    );
+  }
+
+  deleteConversation(conversationId: string): boolean {
+    const deleted = this.conversations.delete(conversationId);
+    if (deleted) {
+      if (this.currentConversationId === conversationId) {
+        this.currentConversationId = null;
+      }
+      this.saveConversationsToStorage();
+    }
+    return deleted;
+  }
+
+  clearAllConversations(): void {
+    this.conversations.clear();
+    this.currentConversationId = null;
+    localStorage.removeItem(this.STORAGE_KEY);
+  }
+
+  private addMessageToConversation(role: 'user' | 'assistant', content: string, language?: string): void {
+    if (!this.currentConversationId) {
+      this.startNewConversation();
+    }
+
+    const conversation = this.conversations.get(this.currentConversationId!);
+    if (conversation) {
+      const message: ChatMessage = {
+        role,
+        content,
+        timestamp: new Date(),
+        language
+      };
+
+      conversation.messages.push(message);
+      conversation.updatedAt = new Date();
+
+      // Trim conversation if it gets too long (keep last MAX_CONVERSATION_LENGTH messages)
+      if (conversation.messages.length > this.MAX_CONVERSATION_LENGTH) {
+        conversation.messages = conversation.messages.slice(-this.MAX_CONVERSATION_LENGTH);
+      }
+
+      this.saveConversationsToStorage();
+    }
+  }
+
+  private getConversationContext(): string {
+    const conversation = this.getCurrentConversation();
+    if (!conversation || conversation.messages.length === 0) {
+      return '';
+    }
+
+    // Get last 10 messages for context (to avoid token limits)
+    const recentMessages = conversation.messages.slice(-10);
+    const context = recentMessages.map(msg =>
+      `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
+    ).join('\n\n');
+
+    return `Previous conversation context:\n${context}\n\n`;
+  }
+
   async generateCode(prompt: string, language: string = 'javascript'): Promise<string> {
     try {
+      // Add user message to conversation
+      this.addMessageToConversation('user', prompt, language);
+
       // Use the improved Gemini 2.0 Flash model
       const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
-      // Create enhanced language-specific prompts
-      const languagePrompt = this.buildEnhancedPrompt(prompt, language);
+      // Get conversation context and create enhanced language-specific prompts
+      const context = this.getConversationContext();
+      const languagePrompt = context + this.buildEnhancedPrompt(prompt, language);
 
       const result = await model.generateContent(languagePrompt);
       const response = await result.response;
       const text = response.text();
 
       // Clean up and enhance the response
-      return this.cleanAndEnhanceCodeResponse(text, language);
+      const cleanedResponse = this.cleanAndEnhanceCodeResponse(text, language);
+
+      // Add assistant response to conversation
+      this.addMessageToConversation('assistant', cleanedResponse, language);
+
+      return cleanedResponse;
     } catch (error: any) {
       console.error('Error in generateCode:', error);
-      
+
       // Check for API key related errors
       if (error?.message?.includes('API_KEY') || error?.message?.includes('Invalid API key') || error?.message?.includes('403') || error?.status === 403) {
         throw new Error('❌ Invalid API key. Please check your Gemini API key in the sidebar settings.');
       }
-      
+
       if (error?.message?.includes('quota') || error?.message?.includes('QUOTA_EXCEEDED')) {
         throw new Error('📊 API quota exceeded. Please try again later or use your own API key.');
       }
-      
+
       // Fallback to regular gemini-2.0-flash if experimental fails
       try {
         const fallbackModel = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-        const languagePrompt = this.buildEnhancedPrompt(prompt, language);
+        const context = this.getConversationContext();
+        const languagePrompt = context + this.buildEnhancedPrompt(prompt, language);
         const result = await fallbackModel.generateContent(languagePrompt);
         const response = await result.response;
         const text = response.text();
-        return this.cleanAndEnhanceCodeResponse(text, language);
+        const cleanedResponse = this.cleanAndEnhanceCodeResponse(text, language);
+
+        // Add assistant response to conversation even on fallback
+        this.addMessageToConversation('assistant', cleanedResponse, language);
+
+        return cleanedResponse;
       } catch (fallbackError: any) {
         console.error('Fallback error:', fallbackError);
         if (fallbackError?.message?.includes('API_KEY') || fallbackError?.message?.includes('Invalid API key') || fallbackError?.message?.includes('403') || fallbackError?.status === 403) {
@@ -407,14 +564,24 @@ ${cleanedText}
   // Method to get code suggestions
   async getCodeSuggestions(code: string, language: string): Promise<string[]> {
     try {
+      // Add user message to conversation
+      const userPrompt = `Please provide improvement suggestions for this ${language} code:\n\n${code}`;
+      this.addMessageToConversation('user', userPrompt, language);
+
       const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-      const prompt = `Analyze this ${language} code and provide 3 specific improvement suggestions:\n\n${code}\n\nProvide only the suggestions as a numbered list, no explanations.`;
-      
+      const context = this.getConversationContext();
+      const prompt = context + `Analyze this ${language} code and provide 3 specific improvement suggestions:\n\n${code}\n\nProvide only the suggestions as a numbered list, no explanations.`;
+
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
-      
-      return text.split('\n').filter((line: string) => line.trim().match(/^\d+\./)).slice(0, 3);
+
+      const suggestions = text.split('\n').filter((line: string) => line.trim().match(/^\d+\./)).slice(0, 3);
+
+      // Add assistant response to conversation
+      this.addMessageToConversation('assistant', suggestions.join('\n'), language);
+
+      return suggestions;
     } catch (error) {
       console.error('Error getting suggestions:', error);
       return [];
@@ -424,12 +591,22 @@ ${cleanedText}
   // Method to explain code
   async explainCode(code: string, language: string): Promise<string> {
     try {
+      // Add user message to conversation
+      const userPrompt = `Please explain what this ${language} code does:\n\n${code}`;
+      this.addMessageToConversation('user', userPrompt, language);
+
       const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-      const prompt = `Provide a brief explanation of what this ${language} code does:\n\n${code}\n\nKeep the explanation concise and beginner-friendly.`;
+      const context = this.getConversationContext();
+      const prompt = context + `Provide a brief explanation of what this ${language} code does:\n\n${code}\n\nKeep the explanation concise and beginner-friendly.`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
-      return response.text().trim();
+      const explanation = response.text().trim();
+
+      // Add assistant response to conversation
+      this.addMessageToConversation('assistant', explanation, language);
+
+      return explanation;
     } catch (error) {
       console.error('Error explaining code:', error);
       return 'Unable to generate explanation.';
