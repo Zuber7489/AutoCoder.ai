@@ -250,121 +250,31 @@ export class GeminiApiService {
   }
 
   private buildEnhancedPrompt(prompt: string, language: string): string {
-    const baseInstructions = `You are an elite senior software engineer with 15+ years of experience. Create EXCELLENT, production-ready, enterprise-grade code that exceeds industry standards.
-
-CRITICAL REQUIREMENTS FOR ALL CODE:
-- ✨ BEAUTIFUL & MODERN: Use stunning gradients, smooth animations, perfect spacing
-- 🎯 FUNCTIONAL: Every feature must work perfectly with proper error handling
-- 📱 RESPONSIVE: Mobile-first design that works on all devices perfectly
-- 🚀 PERFORMANCE: Optimized code with lazy loading and efficient algorithms
-- ♿ ACCESSIBLE: WCAG compliant with proper ARIA labels and keyboard navigation
-- 🔒 SECURE: Sanitize inputs, prevent XSS, use secure coding practices
-- 📚 DOCUMENTED: Comprehensive comments and JSDoc documentation
-- 🧪 TESTABLE: Clean, modular code that's easy to unit test
-- 🎨 DESIGN: Professional UI/UX with micro-interactions and polish`;
+    const baseInstructions = `You are a helpful coding assistant. Please generate clean, well-documented code.`;
 
     switch (language.toLowerCase()) {
       case 'html':
       case 'htmlcss':
         return `${baseInstructions}
 
-Create an ABSOLUTELY STUNNING, PERFECTLY FUNCTIONAL HTML masterpiece for: ${prompt}
+Create HTML code for: ${prompt}
 
-🚀 ADVANCED REQUIREMENTS:
-- COMPLETE, RUNNABLE HTML document with DOCTYPE declaration
-- INTERACTIVE FEATURES: Working buttons, forms, animations, hover effects
-- MODERN DESIGN SYSTEM: Custom CSS variables, consistent spacing, typography scale
-- FLUID ANIMATIONS: CSS keyframes, transform3d, smooth transitions (60fps)
-- ADVANCED LAYOUTS: CSS Grid, Flexbox, Container queries, aspect ratios
-- MICRO-INTERACTIONS: Button ripples, loading states, success animations
-- DARK THEME MASTERPIECE: Professional color palette with perfect contrast
-- RESPONSIVE EXCELLENCE: Mobile-first, tablet, desktop - all perfect
-- ACCESSIBILITY HERO: ARIA labels, focus management, keyboard navigation
-- PERFORMANCE OPTIMIZED: Lazy loading, efficient animations, minimal repaints
-- CROSS-BROWSER MAGIC: Webkit, Firefox, Edge compatibility
-- SEO OPTIMIZED: Proper meta tags, semantic HTML, schema markup
-
-
-
-⚡ FUNCTIONAL FEATURES TO INCLUDE:
-- Smooth scroll navigation with active states
-- Interactive form validation with real-time feedback
-- Animated counters and progress bars
-- Modal dialogs with backdrop blur
-- Toast notifications system
-- Loading spinners and skeleton screens
-- Tabbed interfaces with smooth transitions
-- Accordion components with proper ARIA
-- Image galleries with lightbox functionality
-- Search functionality with debounced input
-- Sortable/filterable data tables
-- Charts and graphs with animated data
-
-🔧 TECHNICAL EXCELLENCE:
-- Semantic HTML5 structure
-- CSS custom properties for theming
-- BEM methodology for CSS organization
-- Optimized images and assets
-- Minimal JavaScript (vanilla, no frameworks unless specified)
-- Error boundaries and graceful degradation
-- Progressive enhancement approach
-
-Return ONLY the complete, functional HTML code. Make it production-ready and absolutely beautiful! ✨`;
+Return ONLY the complete, functional HTML code.`;
       
       case 'css':
         return `${baseInstructions}
 
-Generate modern CSS for: ${prompt}
+Generate CSS for: ${prompt}
 
-Requirements:
-- Use modern CSS features (custom properties, flexbox, grid)
-- Implement responsive design with media queries
-- Add smooth transitions and animations
-- Use a consistent color scheme and typography
-- Include hover and focus states
-- Apply best practices for performance
-- Use BEM or similar naming convention
-
-Return ONLY the CSS code. No explanations or markdown.`;
+Return ONLY the CSS code.`;
       
       case 'javascript':
       case 'js':
         return `${baseInstructions}
 
-Create EXCEPTIONAL, enterprise-grade JavaScript code for: ${prompt}
+Create JavaScript code for: ${prompt}
 
-🚀 ADVANCED JAVASCRIPT REQUIREMENTS:
-- ES2023+ MODERN SYNTAX: Arrow functions, destructuring, optional chaining, nullish coalescing
-- ROBUST ERROR HANDLING: Try-catch-finally, custom error classes, graceful degradation
-- PERFORMANCE OPTIMIZATION: Efficient algorithms, memoization, debouncing, throttling
-- MEMORY MANAGEMENT: Proper cleanup, no memory leaks, garbage collection optimization
-- ASYNC MASTERY: Promises, async/await, proper error propagation, race conditions handling
-- MODULAR ARCHITECTURE: Clean separation of concerns, single responsibility principle
-- ADVANCED PATTERNS: Factory functions, modules, observers, pub/sub, state management
-- INPUT VALIDATION: Sanitization, type checking, schema validation, boundary checks
-- BROWSER COMPATIBILITY: Feature detection, polyfills, fallbacks
-- DEBUGGING SUPPORT: Comprehensive logging, development helpers, error tracking
-
-⚡ FUNCTIONAL EXCELLENCE:
-- Pure functions where possible with immutable data structures
-- Comprehensive JSDoc documentation with examples
-- Event delegation and efficient DOM manipulation
-- Web APIs integration (LocalStorage, IndexedDB, Service Workers)
-- Progressive Web App features when applicable
-- Accessibility integration with ARIA attributes
-- Internationalization support (i18n)
-- Real-time features with WebSockets when needed
-
-🔧 CODE QUALITY STANDARDS:
-- ESLint compliant (Airbnb style guide)
-- Comprehensive unit tests structure
-- Bundle size optimization
-- Tree shaking friendly exports
-- Type safety with JSDoc annotations
-- Performance monitoring integration
-- Security best practices (CSP, XSS prevention)
-
-Return ONLY the JavaScript code with comprehensive comments. Make it production-ready and absolutely bulletproof! 💪`;
+Return ONLY the JavaScript code with comments.`;
       
       case 'typescript':
       case 'ts':
@@ -372,16 +282,7 @@ Return ONLY the JavaScript code with comprehensive comments. Make it production-
 
 Generate TypeScript code for: ${prompt}
 
-Requirements:
-- Use strong typing with interfaces and types
-- Implement proper error handling
-- Follow TypeScript best practices
-- Use modern ES6+ features
-- Add comprehensive JSDoc comments
-- Include proper imports/exports
-- Use generics where appropriate
-
-Return ONLY the TypeScript code. No explanations or markdown.`;
+Return ONLY the TypeScript code.`;
       
       case 'react':
       case 'jsx':
@@ -389,79 +290,35 @@ Return ONLY the TypeScript code. No explanations or markdown.`;
 
 Generate a React component for: ${prompt}
 
-Requirements:
-- Use functional components with hooks
-- Implement proper TypeScript typing
-- Add proper props validation
-- Use modern React patterns
-- Include error boundaries where needed
-- Follow React best practices
-- Add accessibility features
-- Use modern styling approach
-
-Return ONLY the React component code. No explanations or markdown.`;
+Return ONLY the React component code.`;
       
       case 'vue':
         return `${baseInstructions}
 
 Generate a Vue 3 component for: ${prompt}
 
-Requirements:
-- Use Composition API
-- Implement proper TypeScript typing
-- Add reactive data and computed properties
-- Follow Vue 3 best practices
-- Include proper template structure
-- Use modern Vue features
-- Add proper event handling
-
-Return ONLY the Vue component code. No explanations or markdown.`;
+Return ONLY the Vue component code.`;
       
       case 'angular':
         return `${baseInstructions}
 
 Generate an Angular component for: ${prompt}
 
-Requirements:
-- Use modern Angular features
-- Implement proper TypeScript typing
-- Add component lifecycle hooks
-- Follow Angular style guide
-- Use dependency injection
-- Include proper template and styling
-- Add form validation if needed
-
-Return ONLY the Angular component code. No explanations or markdown.`;
+Return ONLY the Angular component code.`;
       
       case 'python':
         return `${baseInstructions}
 
 Generate Python code for: ${prompt}
 
-Requirements:
-- Follow PEP 8 style guidelines
-- Use type hints
-- Add comprehensive docstrings
-- Implement proper error handling
-- Use modern Python features
-- Include input validation
-- Follow clean code principles
-
-Return ONLY the Python code. No explanations or markdown.`;
+Return ONLY the Python code.`;
       
       default:
         return `${baseInstructions}
 
-Generate clean, well-documented ${language} code for: ${prompt}
+Generate ${language} code for: ${prompt}
 
-Requirements:
-- Follow language best practices
-- Add proper comments and documentation
-- Implement error handling
-- Use modern language features
-- Ensure code readability and maintainability
-
-Return ONLY the ${language} code. No explanations or markdown.`;
+Return ONLY the ${language} code.`;
     }
   }
 
