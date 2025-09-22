@@ -191,3 +191,47 @@
   transform: rotate(360deg) scale(1.2);
   filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.6));
 }
+
+/* Count up animation */
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-count-up {
+  animation: count-up 1s ease-out forwards;
+}
+
+/* Pulse animation for badges */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Code preview animation */
+@keyframes code-type {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.code-preview {
+  animation: code-type 3s steps(40, end);
+}
