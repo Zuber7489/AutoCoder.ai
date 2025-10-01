@@ -31,7 +31,7 @@ export class GeminiApiService {
   private currentApiKey: string;
   private conversations: Map<string, ConversationContext> = new Map();
   private currentConversationId: string | null = null;
-  private readonly MAX_CONVERSATION_LENGTH = 50; // Maximum messages per conversation
+  private readonly MAX_CONVERSATION_LENGTH = 5000; // Maximum messages per conversation
   private readonly STORAGE_KEY = 'gemini_conversations';
 
   constructor() {
