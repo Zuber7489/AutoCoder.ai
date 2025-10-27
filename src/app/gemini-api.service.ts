@@ -257,14 +257,38 @@ export class GeminiApiService {
       case 'htmlcss':
         return `${baseInstructions}
 
-Create HTML code for: ${prompt}
+Create a BEAUTIFUL, MODERN website for: ${prompt}
 
-Return ONLY the complete, functional HTML code.`;
+REQUIREMENTS for the website:
+- Beautiful, modern, and professional design
+- Responsive layout (mobile-friendly)
+- Attractive color scheme with gradients or modern color palette
+- Smooth animations and transitions
+- Clean typography with proper spacing
+- Modern UI components (cards, buttons, etc.)
+- Professional styling with shadows, borders, and visual effects
+- Beautiful layout with proper sections and structure
+- Use modern CSS features (flexbox, grid, modern properties)
+- Include smooth hover effects and interactivity
+- Eye-catching visual design that looks premium and polished
+- Use Google Fonts (Inter, Poppins, or similar modern fonts)
+- Add subtle animations and micro-interactions
+- Ensure excellent user experience and visual appeal
+
+Return ONLY the complete, functional HTML code with embedded CSS. Make it look absolutely STUNNING and professional.`;
       
       case 'css':
         return `${baseInstructions}
 
-Generate CSS for: ${prompt}
+Generate BEAUTIFUL CSS for: ${prompt}
+
+REQUIREMENTS:
+- Modern, attractive design with gradients or color schemes
+- Smooth animations and transitions
+- Professional styling with shadows and effects
+- Responsive and mobile-friendly
+- Clean typography with proper spacing
+- Eye-catching visual effects
 
 Return ONLY the CSS code.`;
       
